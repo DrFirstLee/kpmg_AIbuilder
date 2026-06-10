@@ -83,9 +83,20 @@
 		.icon-btn { width: 40px; color: var(--navy); background: var(--soft); }
 
 		main {
-			max-width: 1240px;
+			max-width: 1480px;
 			margin: 0 auto;
 			padding: 30px 28px 48px;
+		}
+
+		.analysis-layout {
+			display: grid;
+			grid-template-columns: minmax(0, 5fr) minmax(280px, 1fr);
+			gap: 18px;
+			align-items: start;
+		}
+
+		.content-column {
+			min-width: 0;
 		}
 
 		.page-head {
@@ -436,9 +447,98 @@
 		.positive { color: var(--green); }
 		.negative { color: var(--red); }
 
+		.chat-panel {
+			position: sticky;
+			top: 84px;
+			height: calc(100vh - 112px);
+			padding: 14px;
+			display: grid;
+			grid-template-rows: auto minmax(0, 1fr) auto;
+			gap: 12px;
+		}
+
+		.chat-head {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: 10px;
+		}
+
+		.chat-head h2 {
+			margin: 0;
+			color: var(--navy);
+			font-size: 1rem;
+		}
+
+		.chat-head p {
+			margin: 5px 0 0;
+			color: var(--muted);
+			font-size: 0.78rem;
+			line-height: 1.38;
+		}
+
+		.chat-model {
+			white-space: nowrap;
+		}
+
+		.chat-messages {
+			overflow: auto;
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			padding-right: 4px;
+		}
+
+		.message {
+			border-radius: 8px;
+			padding: 10px;
+			font-size: 0.84rem;
+			line-height: 1.45;
+			white-space: pre-wrap;
+		}
+
+		.message.assistant {
+			background: var(--soft);
+			color: #34465d;
+		}
+
+		.message.user {
+			background: var(--navy);
+			color: white;
+			margin-left: 18px;
+		}
+
+		.chat-form {
+			display: grid;
+			gap: 8px;
+		}
+
+		.chat-form textarea {
+			min-height: 88px;
+		}
+
+		.quick-prompts {
+			display: grid;
+			gap: 6px;
+		}
+
+		.quick-prompts button {
+			width: 100%;
+			min-height: 32px;
+			border-radius: 8px;
+			background: #f8fbfd;
+			border: 1px solid var(--line);
+			color: var(--navy);
+			font-size: 0.78rem;
+			font-weight: 800;
+			text-align: left;
+			padding: 7px 9px;
+		}
+
 		@media (max-width: 980px) {
-			.page-head, .main-grid, .summary-panel { grid-template-columns: 1fr; }
+			.analysis-layout, .page-head, .main-grid, .summary-panel { grid-template-columns: 1fr; }
 			.chart-panel { position: static; }
+			.chat-panel { position: static; height: 560px; }
 			.kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 		}
 
@@ -464,6 +564,8 @@
 	</header>
 
 	<main>
+		<div class="analysis-layout">
+			<div class="content-column">
 		<section class="page-head">
 			<div class="headline">
 				<h1>분석 결과</h1>
@@ -511,9 +613,33 @@
 				</div>
 			</div>
 		</section>
+			</div>
+
+			<aside class="panel chat-panel" aria-label="Evaluation chatbot">
+				<div class="chat-head">
+					<div>
+						<h2>AI Review Chat</h2>
+						<p>전체 분석 결과, 평균 비교, 익명 평가자 샘플을 기준으로 질문하세요.</p>
+					</div>
+					<span class="pill chat-model">gpt-5.4</span>
+				</div>
+				<div class="quick-prompts">
+					<button type="button" data-prompt="이 후보자의 가장 강한 점과 가장 위험한 점을 요약해줘.">강점/리스크 요약</button>
+					<button type="button" data-prompt="평균 데이터와 비교했을 때 어떤 축을 인터뷰에서 확인해야 해?">평균 대비 확인 축</button>
+					<button type="button" data-prompt="타 평가자 샘플을 고려하면 calibration을 어디서 해야 해?">Calibration 포인트</button>
+				</div>
+				<div class="chat-messages" id="chatMessages"></div>
+				<form class="chat-form" id="chatForm">
+					<textarea id="chatInput" placeholder="예: 이 후보자를 다음 라운드로 보내도 될까? 어떤 질문을 해야 해?"></textarea>
+					<button class="primary-btn" type="submit"><i data-lucide="send"></i>질문하기</button>
+				</form>
+			</aside>
+		</div>
 	</main>
 
 	<script>
+		const ANALYSIS_MODEL = "gpt-5.4";
+
 		const axisDefinitions = [
 			{ id: "problemFraming", label: "Problem Framing", short: "Ambiguity Handling" },
 			{ id: "practicalBuilding", label: "Practical Building", short: "Execution" },
@@ -579,6 +705,8 @@
 			fileName: stored.fileName || "synthetic_sample_resume.pdf",
 			resumeLength: stored.resumeLength || 1530,
 			createdAt: stored.createdAt || new Date().toISOString(),
+			model: stored.model || ANALYSIS_MODEL,
+			apiKey: stored.apiKey || "",
 			results: normalizeResults(stored.results || fallbackResults)
 		};
 
@@ -593,7 +721,10 @@
 			axisList: document.getElementById("axisList"),
 			summaryOutput: document.getElementById("summaryOutput"),
 			copyBtn: document.getElementById("copyBtn"),
-			backBtn: document.getElementById("backBtn")
+			backBtn: document.getElementById("backBtn"),
+			chatMessages: document.getElementById("chatMessages"),
+			chatForm: document.getElementById("chatForm"),
+			chatInput: document.getElementById("chatInput")
 		};
 
 		function readStoredResult() {
@@ -737,6 +868,77 @@
 			elements.summaryOutput.textContent = `Recommendation: ${recommendation}\nCandidate average: ${candidateAverage.toFixed(1)} / 10\nDummy benchmark average: ${benchmarkAverage.toFixed(1)} / 10\nDelta: ${delta >= 0 ? "+" : ""}${delta.toFixed(1)}\n\nTop strengths versus benchmark:\n${strengths.map((item) => `- ${item.label}: ${formatScore(item.reviewerScore)} vs ${formatScore(benchmark[item.id])}. ${item.rationale}`).join("\n")}\n\nMain calibration areas:\n${concerns.map((item) => `- ${item.label}: ${item.concern}`).join("\n")}\n\nSuggested interview follow-up:\n${concerns.map((item) => `- ${item.followUp}`).join("\n")}\n\nReviewer calibration notes:\n${notes.length ? notes.join("\n") : "- No reviewer notes recorded yet."}\n\nGovernance note: Dummy average and anonymous reviewer samples are for calibration only. Final hiring decisions should remain human-owned and supported by documented evidence.`;
 		}
 
+		function buildChatContext() {
+			const axisLines = state.results.map((item) => {
+				const peers = peerReviews[item.id] || [];
+				const peerAverage = average(peers.map((peer) => peer.score));
+				return `${item.label}: candidate ${formatScore(item.reviewerScore)}, dummy average ${formatScore(benchmark[item.id])}, peer average ${formatScore(peerAverage)}, confidence ${item.confidence}. Evidence: ${item.evidence.join(" | ")}. Concern: ${item.concern}. Follow-up: ${item.followUp}.`;
+			}).join("\n");
+
+			return `You are an AI assistant embedded in an AI Builder candidate evaluation dashboard. Answer only from the evaluation data below. Be concise, practical, and remind the reviewer that scores are decision support, not an automated hiring decision.\n\nOverall summary:\n${elements.summaryOutput.textContent}\n\nAxis details:\n${axisLines}`;
+		}
+
+		async function answerWithOpenAI(question) {
+			if (!state.apiKey) return null;
+			const response = await fetch("https://api.openai.com/v1/responses", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${state.apiKey}`
+				},
+				body: JSON.stringify({
+					model: ANALYSIS_MODEL,
+					input: `${buildChatContext()}\n\nReviewer question: ${question}`,
+					temperature: 0.2
+				})
+			});
+
+			if (!response.ok) throw new Error(await response.text());
+			const data = await response.json();
+			return data.output_text || data.output?.flatMap((item) => item.content || []).map((content) => content.text || "").join("\n") || null;
+		}
+
+		function answerLocally(question) {
+			const lower = question.toLowerCase();
+			const sortedHigh = [...state.results].sort((a, b) => b.reviewerScore - a.reviewerScore);
+			const sortedLow = [...state.results].sort((a, b) => a.reviewerScore - b.reviewerScore);
+			const candidateAverage = average(state.results.map((item) => item.reviewerScore));
+			const benchmarkAverage = average(state.results.map((item) => benchmark[item.id]));
+
+			if (lower.includes("calibration") || lower.includes("타 평가") || lower.includes("peer")) {
+				return `Calibration 관점에서는 ${sortedLow.slice(0, 2).map((item) => item.label).join(", ")}를 먼저 봐야 합니다. 이 축들은 후보자 점수와 peer/dummy 비교를 함께 확인해 인터뷰 질문으로 검증하는 것이 좋습니다.\n\n특히 ${sortedLow[0].label}의 follow-up은 "${sortedLow[0].followUp}" 입니다.`;
+			}
+
+			if (lower.includes("평균") || lower.includes("benchmark") || lower.includes("비교")) {
+				const biggestDelta = [...state.results].sort((a, b) => (b.reviewerScore - benchmark[b.id]) - (a.reviewerScore - benchmark[a.id]))[0];
+				const smallestDelta = [...state.results].sort((a, b) => (a.reviewerScore - benchmark[a.id]) - (b.reviewerScore - benchmark[b.id]))[0];
+				return `후보자 평균은 ${candidateAverage.toFixed(1)}이고 dummy 평균은 ${benchmarkAverage.toFixed(1)}입니다. 가장 강한 상대 우위는 ${biggestDelta.label}(+${(biggestDelta.reviewerScore - benchmark[biggestDelta.id]).toFixed(1)})입니다. 가장 확인이 필요한 축은 ${smallestDelta.label}(${(smallestDelta.reviewerScore - benchmark[smallestDelta.id]).toFixed(1)} vs avg)입니다.`;
+			}
+
+			return `요약하면 이 후보자의 강점은 ${sortedHigh.slice(0, 2).map((item) => `${item.label} ${formatScore(item.reviewerScore)}`).join("와 ")}입니다. 주요 리스크 또는 확인 지점은 ${sortedLow.slice(0, 2).map((item) => item.label).join("와 ")}입니다.\n\n다음 인터뷰에서는 "${sortedLow[0].followUp}" 질문으로 점수 근거를 검증하는 것이 좋습니다. 이 답변은 분석 결과 기반 보조 의견이며 최종 판단은 human review로 남겨야 합니다.`;
+		}
+
+		function addChatMessage(role, text) {
+			const message = document.createElement("div");
+			message.className = `message ${role}`;
+			message.textContent = text;
+			elements.chatMessages.appendChild(message);
+			elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+			return message;
+		}
+
+		async function handleChat(question) {
+			addChatMessage("user", question);
+			const pending = addChatMessage("assistant", "분석 결과를 확인하는 중입니다...");
+			try {
+				const answer = await answerWithOpenAI(question);
+				pending.textContent = answer || answerLocally(question);
+			} catch (error) {
+				console.error(error);
+				pending.textContent = `${answerLocally(question)}\n\n참고: gpt-5.4 호출에 실패해 로컬 분석 답변으로 전환했습니다.`;
+			}
+		}
+
 		function drawRadarChart() {
 			const canvas = document.getElementById("radarChart");
 			const candidate = state.results.map((item) => item.reviewerScore);
@@ -822,8 +1024,24 @@
 			await navigator.clipboard.writeText(elements.summaryOutput.textContent);
 		});
 
+		elements.chatForm.addEventListener("submit", (event) => {
+			event.preventDefault();
+			const question = elements.chatInput.value.trim();
+			if (!question) return;
+			elements.chatInput.value = "";
+			handleChat(question);
+		});
+
+		document.querySelectorAll("[data-prompt]").forEach((button) => {
+			button.addEventListener("click", () => {
+				elements.chatInput.value = button.dataset.prompt;
+				elements.chatInput.focus();
+			});
+		});
+
 		lucide.createIcons();
 		render();
+		addChatMessage("assistant", "분석 결과 전체를 기준으로 질문할 수 있습니다. 예를 들어 평균 대비 약점, 인터뷰 질문, calibration 필요 축을 물어보세요. 모델은 gpt-5.4로 고정되어 있습니다.");
 	</script>
 </body>
 </html>

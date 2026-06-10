@@ -632,7 +632,6 @@
 				<span>AI Builder Evaluation Workbench</span>
 			</div>
 			<div class="topbar-actions">
-				<button class="ghost-btn" id="loadSampleBtn"><i data-lucide="file-text"></i>샘플 로드</button>
 				<button class="icon-btn" id="resetBtn" title="초기화"><i data-lucide="rotate-ccw"></i></button>
 			</div>
 		</header>
@@ -681,12 +680,8 @@
 							<input id="apiKey" type="password" autocomplete="off" placeholder="sk-..." />
 						</div>
 						<div class="field">
-							<label for="modelSelect">Model</label>
-							<select id="modelSelect">
-								<option value="gpt-4.1-mini">gpt-4.1-mini</option>
-								<option value="gpt-4.1">gpt-4.1</option>
-								<option value="gpt-4o-mini">gpt-4o-mini</option>
-							</select>
+							<label>Analysis Model <span class="hint">고정</span></label>
+							<input type="text" value="gpt-5.4" readonly />
 						</div>
 						<div class="privacy-note">
 							<i data-lucide="shield-alert"></i>
@@ -753,6 +748,7 @@
 	<script type="module">
 		const pdfjsLib = await import("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs");
 		pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
+		const ANALYSIS_MODEL = "gpt-5.4";
 
 		const axisDefinitions = [
 			{
@@ -830,10 +826,8 @@ Projects
 			dropzone: document.getElementById("dropzone"),
 			fileStatus: document.getElementById("fileStatus"),
 			apiKey: document.getElementById("apiKey"),
-			modelSelect: document.getElementById("modelSelect"),
 			analyzeBtn: document.getElementById("analyzeBtn"),
 			demoAnalyzeBtn: document.getElementById("demoAnalyzeBtn"),
-			loadSampleBtn: document.getElementById("loadSampleBtn"),
 			resetBtn: document.getElementById("resetBtn"),
 			analysisStatus: document.getElementById("analysisStatus"),
 			workspace: document.getElementById("workspace"),
@@ -966,7 +960,7 @@ Return strict JSON only. Shape:
 					"Authorization": `Bearer ${apiKey}`
 				},
 				body: JSON.stringify({
-					model: elements.modelSelect.value,
+					model: ANALYSIS_MODEL,
 					input: buildPrompt(text, retrieved),
 					temperature: 0.2
 				})
@@ -1006,6 +1000,8 @@ Return strict JSON only. Shape:
 				createdAt: new Date().toISOString(),
 				fileName: state.fileName || "resume.pdf",
 				resumeLength: state.resumeText.length,
+				model: ANALYSIS_MODEL,
+				apiKey: elements.apiKey.value.trim(),
 				results
 			};
 			sessionStorage.setItem("aiBuilderEvaluationResult", JSON.stringify(payload));
@@ -1255,12 +1251,6 @@ Return strict JSON only. Shape:
 			state.fileName = "synthetic_sample_resume.pdf";
 			elements.fileStatus.textContent = "synthetic_sample_resume.pdf · sample data loaded";
 			analyzeCurrentResume(true);
-		});
-		elements.loadSampleBtn.addEventListener("click", () => {
-			state.resumeText = sampleResume;
-			state.fileName = "synthetic_sample_resume.pdf";
-			elements.fileStatus.textContent = "synthetic_sample_resume.pdf · sample data loaded";
-			setStatus("샘플 resume가 로드되었습니다. 샘플 분석을 실행하세요.");
 		});
 		elements.resetBtn.addEventListener("click", () => window.location.reload());
 		elements.copySummaryBtn.addEventListener("click", async () => {
