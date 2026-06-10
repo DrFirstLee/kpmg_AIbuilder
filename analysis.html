@@ -88,17 +88,6 @@
 			padding: 30px 28px 48px;
 		}
 
-		.analysis-layout {
-			display: grid;
-			grid-template-columns: minmax(0, 5fr) minmax(280px, 1fr);
-			gap: 18px;
-			align-items: start;
-		}
-
-		.content-column {
-			min-width: 0;
-		}
-
 		.page-head {
 			display: grid;
 			grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
@@ -230,7 +219,7 @@
 		}
 
 		.dot.average { background: var(--amber); }
-		.dot.peer { background: var(--navy); }
+		.dot.cohort { background: var(--navy); }
 
 		.axis-list { display: grid; gap: 12px; }
 
@@ -299,7 +288,7 @@
 		}
 
 		.bar-fill.average { background: var(--amber); }
-		.bar-fill.peer { background: var(--navy); }
+		.bar-fill.cohort { background: var(--navy); }
 
 		.detail-grid {
 			display: grid;
@@ -332,14 +321,14 @@
 
 		.detail-box ul { margin: 0; padding-left: 18px; }
 
-		.peer-panel {
+		.cohort-panel {
 			margin-top: 14px;
 			border: 1px solid var(--line);
 			border-radius: 8px;
 			overflow: hidden;
 		}
 
-		.peer-head {
+		.cohort-head {
 			display: flex;
 			justify-content: space-between;
 			gap: 12px;
@@ -350,20 +339,20 @@
 			font-size: 0.86rem;
 		}
 
-		.peer-grid {
+		.cohort-grid {
 			display: grid;
 			grid-template-columns: repeat(3, minmax(0, 1fr));
 			gap: 1px;
 			background: var(--line);
 		}
 
-		.peer-card {
+		.cohort-card {
 			background: white;
 			padding: 12px;
 			min-height: 116px;
 		}
 
-		.peer-card strong {
+		.cohort-card strong {
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
@@ -372,7 +361,7 @@
 			font-size: 0.86rem;
 		}
 
-		.peer-card p {
+		.cohort-card p {
 			margin: 8px 0 0;
 			color: #4b5b70;
 			font-size: 0.82rem;
@@ -447,15 +436,51 @@
 		.positive { color: var(--green); }
 		.negative { color: var(--red); }
 
+		.chat-launcher {
+			position: fixed;
+			right: 24px;
+			bottom: 24px;
+			z-index: 80;
+			width: 58px;
+			height: 58px;
+			border-radius: 50%;
+			background: var(--navy);
+			color: white;
+			box-shadow: 0 18px 42px rgba(21, 32, 51, 0.28);
+			display: grid;
+			place-items: center;
+		}
+
+		.chat-backdrop {
+			position: fixed;
+			inset: 0;
+			z-index: 70;
+			background: rgba(21, 32, 51, 0.24);
+			display: none;
+		}
+
+		.chat-backdrop.open { display: block; }
+
 		.chat-panel {
-			position: sticky;
-			top: 84px;
-			height: calc(100vh - 112px);
+			position: fixed;
+			right: 0;
+			top: 0;
+			bottom: 0;
+			z-index: 90;
+			width: min(420px, 100vw);
+			transform: translateX(104%);
+			transition: transform 180ms ease;
+			border-radius: 0;
+			border-top: 0;
+			border-right: 0;
+			border-bottom: 0;
 			padding: 14px;
 			display: grid;
 			grid-template-rows: auto minmax(0, 1fr) auto;
 			gap: 12px;
 		}
+
+		.chat-panel.open { transform: translateX(0); }
 
 		.chat-head {
 			display: flex;
@@ -477,8 +502,14 @@
 			line-height: 1.38;
 		}
 
-		.chat-model {
-			white-space: nowrap;
+		.close-chat {
+			width: 36px;
+			height: 36px;
+			border-radius: 8px;
+			background: var(--soft);
+			color: var(--navy);
+			display: grid;
+			place-items: center;
 		}
 
 		.chat-messages {
@@ -536,9 +567,8 @@
 		}
 
 		@media (max-width: 980px) {
-			.analysis-layout, .page-head, .main-grid, .summary-panel { grid-template-columns: 1fr; }
+			.page-head, .main-grid, .summary-panel { grid-template-columns: 1fr; }
 			.chart-panel { position: static; }
-			.chat-panel { position: static; height: 560px; }
 			.kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 		}
 
@@ -546,7 +576,7 @@
 			.topbar { padding: 0 16px; }
 			.top-actions .secondary-btn { display: none; }
 			main { padding-left: 16px; padding-right: 16px; }
-			.kpi-grid, .axis-header, .detail-grid, .peer-grid, .calibration-note { grid-template-columns: 1fr; }
+			.kpi-grid, .axis-header, .detail-grid, .cohort-grid, .calibration-note { grid-template-columns: 1fr; }
 			.bar-row { grid-template-columns: 94px minmax(0, 1fr) 38px; }
 		}
 	</style>
@@ -564,12 +594,10 @@
 	</header>
 
 	<main>
-		<div class="analysis-layout">
-			<div class="content-column">
 		<section class="page-head">
 			<div class="headline">
 				<h1>분석 결과</h1>
-				<p>업로드 화면은 숨기고, Resume 기반 6개 평가 축의 결과만 보여줍니다. 후보자 점수는 dummy 평균 데이터 및 익명화된 타 평가자 샘플과 함께 비교됩니다.</p>
+				<p>업로드 화면은 숨기고, Resume 기반 6개 평가 축의 결과만 보여줍니다. 후보자 점수는 dummy 평균 데이터 및 같은 axis에서 다른 지원자가 어떻게 평가받았는지와 함께 비교됩니다.</p>
 			</div>
 			<aside class="meta-panel">
 				<div class="meta-row"><span>Resume</span><strong id="fileName">-</strong></div>
@@ -591,7 +619,7 @@
 				<div class="legend">
 					<div class="legend-item"><span class="dot"></span>Candidate</div>
 					<div class="legend-item"><span class="dot average"></span>Dummy average</div>
-					<div class="legend-item"><span class="dot peer"></span>Anonymous reviewers</div>
+					<div class="legend-item"><span class="dot cohort"></span>Other candidates</div>
 				</div>
 			</aside>
 			<div class="axis-list" id="axisList"></div>
@@ -607,34 +635,33 @@
 				<div class="checklist">
 					<label class="check-item"><input type="checkbox" checked /> AI 점수만으로 합격/불합격을 결정하지 않음</label>
 					<label class="check-item"><input type="checkbox" checked /> dummy 평균은 비교 기준이며 절대 기준이 아님</label>
-					<label class="check-item"><input type="checkbox" checked /> 타 평가자 결과는 익명화된 calibration sample로만 사용</label>
+					<label class="check-item"><input type="checkbox" checked /> 다른 지원자 사례는 평가 일관성 확인용 benchmark로만 사용</label>
 					<label class="check-item"><input type="checkbox" checked /> 정보 부족 항목은 후속 질문으로 연결</label>
 					<label class="check-item"><input type="checkbox" /> 실제 운영 전 privacy/security review 필요</label>
 				</div>
 			</div>
 		</section>
-			</div>
-
-			<aside class="panel chat-panel" aria-label="Evaluation chatbot">
+		<button class="chat-launcher" id="chatLauncher" title="AI Review Chat"><i data-lucide="message-circle"></i></button>
+		<div class="chat-backdrop" id="chatBackdrop"></div>
+		<aside class="panel chat-panel" id="chatPanel" aria-label="Evaluation chatbot">
 				<div class="chat-head">
 					<div>
 						<h2>AI Review Chat</h2>
-						<p>전체 분석 결과, 평균 비교, 익명 평가자 샘플을 기준으로 질문하세요.</p>
+						<p>전체 분석 결과, 평균 비교, 다른 지원자 benchmark 사례를 기준으로 질문하세요.</p>
 					</div>
-					<span class="pill chat-model">gpt-5.4</span>
+					<button class="close-chat" id="closeChat" title="닫기"><i data-lucide="x"></i></button>
 				</div>
 				<div class="quick-prompts">
 					<button type="button" data-prompt="이 후보자의 가장 강한 점과 가장 위험한 점을 요약해줘.">강점/리스크 요약</button>
 					<button type="button" data-prompt="평균 데이터와 비교했을 때 어떤 축을 인터뷰에서 확인해야 해?">평균 대비 확인 축</button>
-					<button type="button" data-prompt="타 평가자 샘플을 고려하면 calibration을 어디서 해야 해?">Calibration 포인트</button>
+					<button type="button" data-prompt="다른 지원자 benchmark 사례를 고려하면 calibration을 어디서 해야 해?">Calibration 포인트</button>
 				</div>
 				<div class="chat-messages" id="chatMessages"></div>
 				<form class="chat-form" id="chatForm">
 					<textarea id="chatInput" placeholder="예: 이 후보자를 다음 라운드로 보내도 될까? 어떤 질문을 해야 해?"></textarea>
 					<button class="primary-btn" type="submit"><i data-lucide="send"></i>질문하기</button>
 				</form>
-			</aside>
-		</div>
+		</aside>
 	</main>
 
 	<script>
@@ -658,36 +685,36 @@
 			communicationGrowth: 6.7
 		};
 
-		const peerReviews = {
+		const cohortExamples = {
 			problemFraming: [
-				{ reviewer: "Reviewer A", score: 7.2, note: "Strong scoping signals, but would probe assumption-setting." },
-				{ reviewer: "Reviewer B", score: 7.8, note: "Good ambiguity handling from discovery and MVP framing." },
-				{ reviewer: "Reviewer C", score: 6.9, note: "Evidence is promising; role ownership needs interview validation." }
+				{ candidate: "Candidate P-014", score: 7.2, note: "Scoped a workflow MVP from a broad operations pain point." },
+				{ candidate: "Candidate P-031", score: 7.8, note: "Used discovery sessions to define success criteria and tradeoffs." },
+				{ candidate: "Candidate P-046", score: 6.9, note: "Promising framing, but ownership evidence was limited." }
 			],
 			practicalBuilding: [
-				{ reviewer: "Reviewer A", score: 8.4, note: "Clear build evidence and measurable pilot usage." },
-				{ reviewer: "Reviewer B", score: 8.7, note: "Prototype portfolio and workflow deployment are strong." },
-				{ reviewer: "Reviewer C", score: 8.1, note: "Would confirm code depth and production handoff." }
+				{ candidate: "Candidate B-008", score: 8.4, note: "Built a usable automation with measurable pilot usage." },
+				{ candidate: "Candidate B-027", score: 8.7, note: "Shipped a prototype portfolio with clear workflow deployment." },
+				{ candidate: "Candidate B-052", score: 8.1, note: "Strong build evidence, production handoff less clear." }
 			],
 			aiLeverage: [
-				{ reviewer: "Reviewer A", score: 7.4, note: "RAG and prompt evaluation evidence are relevant." },
-				{ reviewer: "Reviewer B", score: 7.1, note: "Good applied AI, not enough agentic autonomy detail." },
-				{ reviewer: "Reviewer C", score: 7.6, note: "Quality measurement and hallucination tracking stand out." }
+				{ candidate: "Candidate A-011", score: 7.4, note: "Applied RAG and prompt evaluation in a workflow context." },
+				{ candidate: "Candidate A-035", score: 7.1, note: "Good applied AI, limited agentic autonomy detail." },
+				{ candidate: "Candidate A-049", score: 7.6, note: "Quality measurement and hallucination tracking stood out." }
 			],
 			enterpriseJudgment: [
-				{ reviewer: "Reviewer A", score: 8.5, note: "Security and retention assumptions are unusually explicit." },
-				{ reviewer: "Reviewer B", score: 8.0, note: "Good governance awareness; needs deeper control design probe." },
-				{ reviewer: "Reviewer C", score: 8.3, note: "Human approval and low-confidence routing are strong signals." }
+				{ candidate: "Candidate E-006", score: 8.5, note: "Security and retention assumptions were explicit." },
+				{ candidate: "Candidate E-019", score: 8.0, note: "Good governance awareness, deeper controls unclear." },
+				{ candidate: "Candidate E-044", score: 8.3, note: "Human approval and low-confidence routing were strong signals." }
 			],
 			stakeholderThinking: [
-				{ reviewer: "Reviewer A", score: 7.9, note: "Cross-functional discovery is clear." },
-				{ reviewer: "Reviewer B", score: 7.4, note: "Good stakeholder range, adoption evidence should be tested." },
-				{ reviewer: "Reviewer C", score: 7.8, note: "Training and senior demo support user-centered score." }
+				{ candidate: "Candidate S-009", score: 7.9, note: "Cross-functional discovery was clearly described." },
+				{ candidate: "Candidate S-024", score: 7.4, note: "Good stakeholder range, adoption evidence lighter." },
+				{ candidate: "Candidate S-041", score: 7.8, note: "Training and senior demo supported user-centered score." }
 			],
 			communicationGrowth: [
-				{ reviewer: "Reviewer A", score: 7.5, note: "Self-taught technical path plus demos show growth." },
-				{ reviewer: "Reviewer B", score: 7.0, note: "Documentation evidence exists; presentation quality unknown." },
-				{ reviewer: "Reviewer C", score: 7.6, note: "Good learning agility and non-technical onboarding." }
+				{ candidate: "Candidate C-013", score: 7.5, note: "Self-taught technical path plus demos showed growth." },
+				{ candidate: "Candidate C-029", score: 7.0, note: "Documentation evidence existed; presentation quality unknown." },
+				{ candidate: "Candidate C-047", score: 7.6, note: "Good learning agility and non-technical onboarding." }
 			]
 		};
 
@@ -722,6 +749,10 @@
 			summaryOutput: document.getElementById("summaryOutput"),
 			copyBtn: document.getElementById("copyBtn"),
 			backBtn: document.getElementById("backBtn"),
+			chatLauncher: document.getElementById("chatLauncher"),
+			chatBackdrop: document.getElementById("chatBackdrop"),
+			chatPanel: document.getElementById("chatPanel"),
+			closeChat: document.getElementById("closeChat"),
 			chatMessages: document.getElementById("chatMessages"),
 			chatForm: document.getElementById("chatForm"),
 			chatInput: document.getElementById("chatInput")
@@ -785,8 +816,8 @@
 
 		function renderAxisCard(result) {
 			const average = benchmark[result.id];
-			const peers = peerReviews[result.id] || [];
-			const peerAverage = peers.reduce((sum, peer) => sum + peer.score, 0) / Math.max(1, peers.length);
+			const cohort = cohortExamples[result.id] || [];
+			const cohortAverage = cohort.reduce((sum, example) => sum + example.score, 0) / Math.max(1, cohort.length);
 			const delta = result.reviewerScore - average;
 			const deltaClass = delta >= 0 ? "positive" : "negative";
 
@@ -804,7 +835,7 @@
 					<div class="compare-bars">
 						${renderBar("Candidate", result.reviewerScore, "", `candidate-bar-${result.id}`, `candidate-value-${result.id}`)}
 						${renderBar("Dummy average", average, "average")}
-						${renderBar("Peer average", peerAverage, "peer")}
+						${renderBar("Other candidates", cohortAverage, "cohort")}
 					</div>
 
 					<div class="detail-grid">
@@ -814,24 +845,24 @@
 						<div class="detail-box"><strong>Follow-up</strong><p>${escapeHtml(result.followUp)}</p></div>
 					</div>
 
-					<div class="peer-panel">
-						<div class="peer-head"><span>익명 타 평가자 calibration sample</span><span>dummy data</span></div>
-						<div class="peer-grid">
-							${peers.map((peer) => `
-								<div class="peer-card">
-									<strong><span>${peer.reviewer}</span><span>${formatScore(peer.score)}</span></strong>
-									<p>${escapeHtml(peer.note)}</p>
+					<div class="cohort-panel">
+						<div class="cohort-head"><span>같은 axis의 다른 지원자 평가 사례</span><span>dummy benchmark</span></div>
+						<div class="cohort-grid">
+							${cohort.map((example) => `
+								<div class="cohort-card">
+									<strong><span>${example.candidate}</span><span>${formatScore(example.score)}</span></strong>
+									<p>${escapeHtml(example.note)}</p>
 								</div>
 							`).join("")}
 						</div>
 					</div>
 
 					<div class="calibration-note">
-						<textarea data-note="${result.id}" placeholder="평가자가 평균/타 평가자 결과를 보고 조정한 이유를 기록하세요.">${escapeHtml(result.reviewerNote)}</textarea>
+						<textarea data-note="${result.id}" placeholder="평균/다른 지원자 사례를 보고 조정한 이유를 기록하세요.">${escapeHtml(result.reviewerNote)}</textarea>
 						<select aria-label="${result.label} calibration decision">
 							<option>Keep calibrated score</option>
-							<option>Raise after peer comparison</option>
-							<option>Lower after peer comparison</option>
+							<option>Raise after benchmark comparison</option>
+							<option>Lower after benchmark comparison</option>
 							<option>Needs panel discussion</option>
 						</select>
 					</div>
@@ -865,14 +896,14 @@
 			elements.deltaAvg.textContent = `${delta >= 0 ? "+" : ""}${delta.toFixed(1)}`;
 			elements.deltaAvg.className = delta >= 0 ? "positive" : "negative";
 			elements.recommendation.textContent = recommendation;
-			elements.summaryOutput.textContent = `Recommendation: ${recommendation}\nCandidate average: ${candidateAverage.toFixed(1)} / 10\nDummy benchmark average: ${benchmarkAverage.toFixed(1)} / 10\nDelta: ${delta >= 0 ? "+" : ""}${delta.toFixed(1)}\n\nTop strengths versus benchmark:\n${strengths.map((item) => `- ${item.label}: ${formatScore(item.reviewerScore)} vs ${formatScore(benchmark[item.id])}. ${item.rationale}`).join("\n")}\n\nMain calibration areas:\n${concerns.map((item) => `- ${item.label}: ${item.concern}`).join("\n")}\n\nSuggested interview follow-up:\n${concerns.map((item) => `- ${item.followUp}`).join("\n")}\n\nReviewer calibration notes:\n${notes.length ? notes.join("\n") : "- No reviewer notes recorded yet."}\n\nGovernance note: Dummy average and anonymous reviewer samples are for calibration only. Final hiring decisions should remain human-owned and supported by documented evidence.`;
+			elements.summaryOutput.textContent = `Recommendation: ${recommendation}\nCandidate average: ${candidateAverage.toFixed(1)} / 10\nDummy benchmark average: ${benchmarkAverage.toFixed(1)} / 10\nDelta: ${delta >= 0 ? "+" : ""}${delta.toFixed(1)}\n\nTop strengths versus benchmark:\n${strengths.map((item) => `- ${item.label}: ${formatScore(item.reviewerScore)} vs ${formatScore(benchmark[item.id])}. ${item.rationale}`).join("\n")}\n\nMain calibration areas:\n${concerns.map((item) => `- ${item.label}: ${item.concern}`).join("\n")}\n\nSuggested interview follow-up:\n${concerns.map((item) => `- ${item.followUp}`).join("\n")}\n\nReviewer calibration notes:\n${notes.length ? notes.join("\n") : "- No reviewer notes recorded yet."}\n\nGovernance note: Dummy average and other-candidate benchmark examples are for calibration consistency only. Final hiring decisions should remain human-owned and supported by documented evidence.`;
 		}
 
 		function buildChatContext() {
 			const axisLines = state.results.map((item) => {
-				const peers = peerReviews[item.id] || [];
-				const peerAverage = average(peers.map((peer) => peer.score));
-				return `${item.label}: candidate ${formatScore(item.reviewerScore)}, dummy average ${formatScore(benchmark[item.id])}, peer average ${formatScore(peerAverage)}, confidence ${item.confidence}. Evidence: ${item.evidence.join(" | ")}. Concern: ${item.concern}. Follow-up: ${item.followUp}.`;
+				const cohort = cohortExamples[item.id] || [];
+				const cohortAverage = average(cohort.map((example) => example.score));
+				return `${item.label}: candidate ${formatScore(item.reviewerScore)}, dummy average ${formatScore(benchmark[item.id])}, other-candidate benchmark average ${formatScore(cohortAverage)}, confidence ${item.confidence}. Evidence: ${item.evidence.join(" | ")}. Concern: ${item.concern}. Follow-up: ${item.followUp}. Other candidate examples: ${cohort.map((example) => `${example.candidate} ${formatScore(example.score)} ${example.note}`).join(" | ")}.`;
 			}).join("\n");
 
 			return `You are an AI assistant embedded in an AI Builder candidate evaluation dashboard. Answer only from the evaluation data below. Be concise, practical, and remind the reviewer that scores are decision support, not an automated hiring decision.\n\nOverall summary:\n${elements.summaryOutput.textContent}\n\nAxis details:\n${axisLines}`;
@@ -905,8 +936,8 @@
 			const candidateAverage = average(state.results.map((item) => item.reviewerScore));
 			const benchmarkAverage = average(state.results.map((item) => benchmark[item.id]));
 
-			if (lower.includes("calibration") || lower.includes("타 평가") || lower.includes("peer")) {
-				return `Calibration 관점에서는 ${sortedLow.slice(0, 2).map((item) => item.label).join(", ")}를 먼저 봐야 합니다. 이 축들은 후보자 점수와 peer/dummy 비교를 함께 확인해 인터뷰 질문으로 검증하는 것이 좋습니다.\n\n특히 ${sortedLow[0].label}의 follow-up은 "${sortedLow[0].followUp}" 입니다.`;
+			if (lower.includes("calibration") || lower.includes("다른 지원자") || lower.includes("benchmark")) {
+				return `Calibration 관점에서는 ${sortedLow.slice(0, 2).map((item) => item.label).join(", ")}를 먼저 봐야 합니다. 이 축들은 후보자 점수와 dummy 평균, 같은 axis의 다른 지원자 사례를 함께 확인해 인터뷰 질문으로 검증하는 것이 좋습니다.\n\n특히 ${sortedLow[0].label}의 follow-up은 "${sortedLow[0].followUp}" 입니다.`;
 			}
 
 			if (lower.includes("평균") || lower.includes("benchmark") || lower.includes("비교")) {
@@ -943,10 +974,10 @@
 			const canvas = document.getElementById("radarChart");
 			const candidate = state.results.map((item) => item.reviewerScore);
 			const averageValues = state.results.map((item) => benchmark[item.id]);
-			const peerValues = state.results.map((item) => average((peerReviews[item.id] || []).map((peer) => peer.score)));
+			const cohortValues = state.results.map((item) => average((cohortExamples[item.id] || []).map((example) => example.score)));
 			drawRadar(canvas, [
 				{ values: averageValues, fill: "rgba(179, 92, 0, 0.12)", stroke: "#b35c00" },
-				{ values: peerValues, fill: "rgba(23, 50, 77, 0.10)", stroke: "#17324d" },
+				{ values: cohortValues, fill: "rgba(23, 50, 77, 0.10)", stroke: "#17324d" },
 				{ values: candidate, fill: "rgba(0, 124, 137, 0.22)", stroke: "#007c89" }
 			], state.results.map((item) => item.label));
 		}
@@ -1016,6 +1047,17 @@
 			return String(value).replace(/[&<>"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[character]));
 		}
 
+		function openChat() {
+			elements.chatPanel.classList.add("open");
+			elements.chatBackdrop.classList.add("open");
+			elements.chatInput.focus();
+		}
+
+		function closeChat() {
+			elements.chatPanel.classList.remove("open");
+			elements.chatBackdrop.classList.remove("open");
+		}
+
 		elements.backBtn.addEventListener("click", () => {
 			window.location.href = "index.html";
 		});
@@ -1023,6 +1065,10 @@
 		elements.copyBtn.addEventListener("click", async () => {
 			await navigator.clipboard.writeText(elements.summaryOutput.textContent);
 		});
+
+		elements.chatLauncher.addEventListener("click", openChat);
+		elements.closeChat.addEventListener("click", closeChat);
+		elements.chatBackdrop.addEventListener("click", closeChat);
 
 		elements.chatForm.addEventListener("submit", (event) => {
 			event.preventDefault();
@@ -1035,13 +1081,14 @@
 		document.querySelectorAll("[data-prompt]").forEach((button) => {
 			button.addEventListener("click", () => {
 				elements.chatInput.value = button.dataset.prompt;
+				openChat();
 				elements.chatInput.focus();
 			});
 		});
 
 		lucide.createIcons();
 		render();
-		addChatMessage("assistant", "분석 결과 전체를 기준으로 질문할 수 있습니다. 예를 들어 평균 대비 약점, 인터뷰 질문, calibration 필요 축을 물어보세요. 모델은 gpt-5.4로 고정되어 있습니다.");
+		addChatMessage("assistant", "분석 결과 전체를 기준으로 질문할 수 있습니다. 예를 들어 평균 대비 약점, 인터뷰 질문, calibration 필요 축을 물어보세요.");
 	</script>
 </body>
 </html>

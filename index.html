@@ -120,13 +120,10 @@
 		main { flex: 1; }
 
 		.hero {
-			display: grid;
-			grid-template-columns: minmax(0, 1fr) minmax(360px, 520px);
-			gap: 34px;
+			display: block;
 			padding: 48px 28px 34px;
 			max-width: 1240px;
 			margin: 0 auto;
-			align-items: center;
 		}
 
 		.hero-copy h1 {
@@ -176,69 +173,73 @@
 			line-height: 1.45;
 		}
 
-		.hero-visual {
-			min-height: 360px;
+
+		.info-section {
+			max-width: 1240px;
+			margin: 0 auto 28px;
+			padding: 0 28px;
+		}
+
+		.section-heading {
+			margin-bottom: 14px;
+		}
+
+		.section-heading h2 {
+			margin: 0;
+			color: var(--navy);
+			font-size: 1.35rem;
+		}
+
+		.section-heading p {
+			margin: 6px 0 0;
+			color: var(--muted);
+			line-height: 1.55;
+		}
+
+		.axis-grid {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 12px;
+		}
+
+		.axis-info, .pipeline-step {
 			border: 1px solid var(--line);
 			border-radius: 8px;
-			background: linear-gradient(180deg, #ffffff 0%, #eef7f7 100%);
-			box-shadow: var(--shadow);
-			position: relative;
-			overflow: hidden;
+			background: white;
+			padding: 15px;
+			box-shadow: 0 10px 26px rgba(21, 32, 51, 0.06);
+		}
+
+		.axis-info strong, .pipeline-step strong {
+			display: block;
+			color: var(--navy);
+			font-size: 0.94rem;
+		}
+
+		.axis-info p, .pipeline-step p {
+			margin: 7px 0 0;
+			color: #4d5d72;
+			font-size: 0.84rem;
+			line-height: 1.48;
+		}
+
+		.pipeline-grid {
+			display: grid;
+			grid-template-columns: repeat(5, minmax(0, 1fr));
+			gap: 10px;
+		}
+
+		.step-number {
+			width: 28px;
+			height: 28px;
+			border-radius: 8px;
 			display: grid;
 			place-items: center;
-			padding: 28px;
-		}
-
-		.illustration {
-			width: min(100%, 420px);
-			aspect-ratio: 1.12;
-			position: relative;
-		}
-
-		.screen {
-			position: absolute;
-			inset: 44px 24px 34px 24px;
-			border: 2px solid #b9c8d8;
-			border-radius: 8px;
-			background: #fff;
-			box-shadow: 0 18px 44px rgba(23, 50, 77, 0.15);
-			padding: 22px;
-		}
-
-		.screen-line {
-			height: 10px;
-			border-radius: 99px;
-			background: #d9e1ea;
-			margin-bottom: 12px;
-		}
-
-		.screen-line:nth-child(1) { width: 64%; background: var(--teal); }
-		.screen-line:nth-child(2) { width: 82%; }
-		.screen-line:nth-child(3) { width: 52%; }
-		.screen-line:nth-child(4) { width: 74%; }
-
-		.mini-radar {
-			width: 150px;
-			height: 150px;
-			position: absolute;
-			right: 14px;
-			bottom: 12px;
-		}
-
-		.floating-chip {
-			position: absolute;
-			left: 6px;
-			bottom: 24px;
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
+			margin-bottom: 10px;
 			background: var(--navy);
 			color: white;
-			border-radius: 8px;
-			padding: 10px 12px;
+			font-weight: 900;
 			font-size: 0.84rem;
-			font-weight: 700;
-			box-shadow: 0 14px 34px rgba(23, 50, 77, 0.22);
 		}
 
 		.upload-band {
@@ -606,18 +607,19 @@
 		@keyframes spin { to { transform: rotate(360deg); } }
 
 		@media (max-width: 980px) {
-			.hero, .upload-panel, .dashboard-grid, .summary-panel {
+			.upload-panel, .dashboard-grid, .summary-panel {
 				grid-template-columns: 1fr;
 			}
 
 			.hero { padding-top: 34px; }
 			.hero-points { grid-template-columns: 1fr; }
+			.axis-grid, .pipeline-grid { grid-template-columns: 1fr; }
 		}
 
 		@media (max-width: 720px) {
 			.topbar { padding: 0 16px; }
 			.topbar-actions .ghost-btn { display: none; }
-			.hero, .upload-band, .workspace { padding-left: 16px; padding-right: 16px; }
+			.hero, .upload-band, .workspace, .info-section { padding-left: 16px; padding-right: 16px; }
 			.axis-head { grid-template-columns: 1fr; }
 			.evidence-grid, .reviewer-notes { grid-template-columns: 1fr; }
 			.score-summary { grid-template-columns: 1fr; }
@@ -647,17 +649,34 @@
 						<div class="point"><strong>Human calibration</strong><span>애매한 부분은 평가자가 점수와 코멘트를 조정합니다.</span></div>
 					</div>
 				</div>
-				<div class="hero-visual" aria-hidden="true">
-					<div class="illustration">
-						<div class="screen">
-							<div class="screen-line"></div>
-							<div class="screen-line"></div>
-							<div class="screen-line"></div>
-							<div class="screen-line"></div>
-							<canvas class="mini-radar" id="miniRadar" width="180" height="180"></canvas>
-						</div>
-						<div class="floating-chip"><i data-lucide="scan-search"></i>Evidence first</div>
-					</div>
+			</section>
+
+			<section class="info-section" aria-label="Evaluation axes">
+				<div class="section-heading">
+					<h2>6개 평가 축</h2>
+					<p>학교나 회사 브랜드보다 Resume 안의 실제 근거를 기준으로, 각 축을 0~10점으로 평가합니다.</p>
+				</div>
+				<div class="axis-grid">
+					<div class="axis-info"><strong>Problem Framing</strong><p>모호한 문제를 정의하고 MVP 범위, 성공 기준, tradeoff를 세운 근거를 봅니다.</p></div>
+					<div class="axis-info"><strong>Practical Building</strong><p>프로토타입, 자동화, API, dashboard 등 실제 작동 산출물을 만든 경험을 봅니다.</p></div>
+					<div class="axis-info"><strong>AI Leverage</strong><p>LLM, RAG, agent, prompt evaluation을 문제 해결 workflow에 적용한 방식을 봅니다.</p></div>
+					<div class="axis-info"><strong>Enterprise Judgment</strong><p>보안, privacy, governance, human approval, 운영 리스크를 고려했는지 봅니다.</p></div>
+					<div class="axis-info"><strong>Stakeholder Thinking</strong><p>비즈니스, IT, legal, 사용자 등 여러 이해관계자 요구를 조율한 근거를 봅니다.</p></div>
+					<div class="axis-info"><strong>Communication & Growth</strong><p>복잡한 내용을 설명하고 빠르게 배우며 문서화, 데모, onboarding까지 연결한 경험을 봅니다.</p></div>
+				</div>
+			</section>
+
+			<section class="info-section" aria-label="Evaluation pipeline">
+				<div class="section-heading">
+					<h2>평가 파이프라인</h2>
+					<p>AI는 Resume 근거 추출과 정리만 돕고, 최종 판단과 calibration은 사람이 수행합니다.</p>
+				</div>
+				<div class="pipeline-grid">
+					<div class="pipeline-step"><div class="step-number">1</div><strong>PDF Intake</strong><p>Resume PDF에서 텍스트를 추출하고 분석 가능한 문장 단위로 나눕니다.</p></div>
+					<div class="pipeline-step"><div class="step-number">2</div><strong>Evidence Retrieval</strong><p>6개 axis별로 관련 문장을 검색해 RAG evidence 후보를 만듭니다.</p></div>
+					<div class="pipeline-step"><div class="step-number">3</div><strong>Scoring</strong><p>근거의 구체성, ownership, impact, enterprise relevance를 기준으로 점수화합니다.</p></div>
+					<div class="pipeline-step"><div class="step-number">4</div><strong>Benchmark</strong><p>dummy 평균과 같은 axis의 다른 지원자 사례를 비교해 일관성을 확인합니다.</p></div>
+					<div class="pipeline-step"><div class="step-number">5</div><strong>Human Calibration</strong><p>평가자가 점수와 메모를 조정하고 후속 인터뷰 질문을 정합니다.</p></div>
 				</div>
 			</section>
 
@@ -678,10 +697,6 @@
 						<div class="field">
 							<label for="apiKey">OpenAI API Key <span class="hint">브라우저 세션에서만 사용</span></label>
 							<input id="apiKey" type="password" autocomplete="off" placeholder="sk-..." />
-						</div>
-						<div class="field">
-							<label>Analysis Model <span class="hint">고정</span></label>
-							<input type="text" value="gpt-5.4" readonly />
 						</div>
 						<div class="privacy-note">
 							<i data-lucide="shield-alert"></i>
@@ -1259,7 +1274,6 @@ Return strict JSON only. Shape:
 		});
 
 		lucide.createIcons();
-		drawRadar(document.getElementById("miniRadar"), [8, 7, 8.5, 6.8, 7.6, 7.2], ["", "", "", "", "", ""]);
 	</script>
 </body>
 </html>
