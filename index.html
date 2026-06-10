@@ -1,1 +1,1267 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>AI Builder Evaluation Workbench</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
+	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+	<style>
+		:root {
+			--bg: #f6f8fb;
+			--surface: #ffffff;
+			--surface-soft: #eef3f8;
+			--text: #152033;
+			--muted: #667085;
+			--line: #d9e1ea;
+			--navy: #17324d;
+			--teal: #007c89;
+			--green: #3f7d20;
+			--amber: #b35c00;
+			--red: #b42318;
+			--blue: #2662d9;
+			--shadow: 0 18px 50px rgba(21, 32, 51, 0.11);
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			margin: 0;
+			font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+			background: var(--bg);
+			color: var(--text);
+		}
+
+		button, input, textarea, select { font: inherit; }
+
+		button {
+			border: 0;
+			cursor: pointer;
+		}
+
+		.app-shell {
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.topbar {
+			height: 64px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 0 28px;
+			border-bottom: 1px solid var(--line);
+			background: rgba(255, 255, 255, 0.88);
+			backdrop-filter: blur(16px);
+			position: sticky;
+			top: 0;
+			z-index: 20;
+		}
+
+		.brand {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			font-weight: 800;
+			color: var(--navy);
+		}
+
+		.brand-mark {
+			width: 34px;
+			height: 34px;
+			border-radius: 8px;
+			display: grid;
+			place-items: center;
+			color: white;
+			background: linear-gradient(135deg, var(--navy), var(--teal));
+		}
+
+		.topbar-actions {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.ghost-btn, .primary-btn, .secondary-btn, .icon-btn {
+			min-height: 40px;
+			border-radius: 8px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			font-weight: 700;
+		}
+
+		.ghost-btn {
+			color: var(--navy);
+			background: transparent;
+			padding: 0 12px;
+		}
+
+		.primary-btn {
+			color: white;
+			background: var(--navy);
+			padding: 0 16px;
+		}
+
+		.secondary-btn {
+			color: var(--navy);
+			background: var(--surface-soft);
+			padding: 0 14px;
+		}
+
+		.icon-btn {
+			width: 40px;
+			color: var(--navy);
+			background: var(--surface-soft);
+		}
+
+		main { flex: 1; }
+
+		.hero {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) minmax(360px, 520px);
+			gap: 34px;
+			padding: 48px 28px 34px;
+			max-width: 1240px;
+			margin: 0 auto;
+			align-items: center;
+		}
+
+		.hero-copy h1 {
+			margin: 0;
+			max-width: 760px;
+			color: var(--navy);
+			font-size: clamp(2.2rem, 5vw, 4.7rem);
+			line-height: 0.98;
+			letter-spacing: 0;
+		}
+
+		.hero-copy p {
+			margin: 20px 0 0;
+			max-width: 680px;
+			color: #44546a;
+			font-size: 1.08rem;
+			line-height: 1.72;
+		}
+
+		.hero-points {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 10px;
+			margin-top: 28px;
+			max-width: 760px;
+		}
+
+		.point {
+			min-height: 74px;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			background: rgba(255, 255, 255, 0.78);
+			padding: 14px;
+		}
+
+		.point strong {
+			display: block;
+			color: var(--navy);
+			font-size: 0.9rem;
+		}
+
+		.point span {
+			display: block;
+			margin-top: 5px;
+			color: var(--muted);
+			font-size: 0.82rem;
+			line-height: 1.45;
+		}
+
+		.hero-visual {
+			min-height: 360px;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			background: linear-gradient(180deg, #ffffff 0%, #eef7f7 100%);
+			box-shadow: var(--shadow);
+			position: relative;
+			overflow: hidden;
+			display: grid;
+			place-items: center;
+			padding: 28px;
+		}
+
+		.illustration {
+			width: min(100%, 420px);
+			aspect-ratio: 1.12;
+			position: relative;
+		}
+
+		.screen {
+			position: absolute;
+			inset: 44px 24px 34px 24px;
+			border: 2px solid #b9c8d8;
+			border-radius: 8px;
+			background: #fff;
+			box-shadow: 0 18px 44px rgba(23, 50, 77, 0.15);
+			padding: 22px;
+		}
+
+		.screen-line {
+			height: 10px;
+			border-radius: 99px;
+			background: #d9e1ea;
+			margin-bottom: 12px;
+		}
+
+		.screen-line:nth-child(1) { width: 64%; background: var(--teal); }
+		.screen-line:nth-child(2) { width: 82%; }
+		.screen-line:nth-child(3) { width: 52%; }
+		.screen-line:nth-child(4) { width: 74%; }
+
+		.mini-radar {
+			width: 150px;
+			height: 150px;
+			position: absolute;
+			right: 14px;
+			bottom: 12px;
+		}
+
+		.floating-chip {
+			position: absolute;
+			left: 6px;
+			bottom: 24px;
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			background: var(--navy);
+			color: white;
+			border-radius: 8px;
+			padding: 10px 12px;
+			font-size: 0.84rem;
+			font-weight: 700;
+			box-shadow: 0 14px 34px rgba(23, 50, 77, 0.22);
+		}
+
+		.upload-band {
+			max-width: 1240px;
+			margin: 0 auto 36px;
+			padding: 0 28px;
+		}
+
+		.upload-panel {
+			display: grid;
+			grid-template-columns: minmax(300px, 0.9fr) minmax(0, 1.1fr);
+			gap: 20px;
+			background: var(--surface);
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			box-shadow: var(--shadow);
+			padding: 20px;
+		}
+
+		.dropzone {
+			min-height: 250px;
+			border: 2px dashed #adc0d4;
+			border-radius: 8px;
+			background: #f8fbfd;
+			display: grid;
+			place-items: center;
+			text-align: center;
+			padding: 24px;
+			transition: 160ms ease;
+		}
+
+		.dropzone.dragover {
+			border-color: var(--teal);
+			background: #edf9fa;
+		}
+
+		.dropzone input { display: none; }
+
+		.drop-icon {
+			width: 54px;
+			height: 54px;
+			border-radius: 8px;
+			display: grid;
+			place-items: center;
+			color: var(--teal);
+			background: #e5f4f5;
+			margin: 0 auto 14px;
+		}
+
+		.dropzone h2 {
+			margin: 0;
+			color: var(--navy);
+			font-size: 1.25rem;
+		}
+
+		.dropzone p {
+			margin: 8px auto 16px;
+			max-width: 340px;
+			color: var(--muted);
+			line-height: 1.55;
+			font-size: 0.94rem;
+		}
+
+		.control-panel {
+			display: grid;
+			gap: 14px;
+			align-content: start;
+		}
+
+		.field label {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+			margin-bottom: 7px;
+			color: var(--navy);
+			font-weight: 800;
+			font-size: 0.9rem;
+		}
+
+		.field input, .field textarea, .field select {
+			width: 100%;
+			border: 1px solid #cbd7e3;
+			border-radius: 8px;
+			background: #fff;
+			color: var(--text);
+			padding: 12px;
+			outline: none;
+		}
+
+		.field textarea {
+			min-height: 118px;
+			resize: vertical;
+		}
+
+		.hint {
+			color: var(--muted);
+			font-size: 0.8rem;
+			line-height: 1.45;
+		}
+
+		.action-row {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			align-items: center;
+		}
+
+		.status-line {
+			min-height: 22px;
+			color: var(--muted);
+			font-size: 0.88rem;
+		}
+
+		.workspace {
+			max-width: 1240px;
+			margin: 0 auto;
+			padding: 0 28px 44px;
+			display: none;
+		}
+
+		.workspace.visible { display: block; }
+
+		.section-title {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 16px;
+			margin: 28px 0 14px;
+		}
+
+		.section-title h2 {
+			margin: 0;
+			color: var(--navy);
+			font-size: 1.35rem;
+		}
+
+		.section-title p {
+			margin: 6px 0 0;
+			color: var(--muted);
+			line-height: 1.5;
+		}
+
+		.dashboard-grid {
+			display: grid;
+			grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+			gap: 20px;
+			align-items: start;
+		}
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			box-shadow: 0 12px 34px rgba(21, 32, 51, 0.07);
+		}
+
+		.chart-panel { padding: 20px; }
+
+		.score-summary {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 10px;
+			margin-top: 16px;
+		}
+
+		.summary-tile {
+			background: var(--surface-soft);
+			border-radius: 8px;
+			padding: 12px;
+		}
+
+		.summary-tile span {
+			display: block;
+			color: var(--muted);
+			font-size: 0.74rem;
+			font-weight: 800;
+			text-transform: uppercase;
+		}
+
+		.summary-tile strong {
+			display: block;
+			margin-top: 6px;
+			color: var(--navy);
+			font-size: 1.35rem;
+		}
+
+		.axis-list {
+			display: grid;
+			gap: 12px;
+		}
+
+		.axis-item {
+			padding: 16px;
+		}
+
+		.axis-head {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) 84px 130px;
+			gap: 12px;
+			align-items: center;
+		}
+
+		.axis-title strong {
+			display: block;
+			color: var(--navy);
+			font-size: 0.98rem;
+		}
+
+		.axis-title span {
+			display: block;
+			margin-top: 4px;
+			color: var(--muted);
+			font-size: 0.82rem;
+			line-height: 1.42;
+		}
+
+		.score-badge {
+			justify-self: start;
+			min-width: 64px;
+			border-radius: 8px;
+			padding: 9px 10px;
+			text-align: center;
+			color: white;
+			background: var(--teal);
+			font-weight: 900;
+		}
+
+		.axis-head input[type="range"] { width: 100%; }
+
+		.evidence-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 10px;
+			margin-top: 12px;
+		}
+
+		.evidence-box {
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			padding: 11px;
+			background: #fbfcfe;
+			min-height: 90px;
+		}
+
+		.evidence-box strong {
+			display: block;
+			margin-bottom: 6px;
+			color: var(--navy);
+			font-size: 0.82rem;
+		}
+
+		.evidence-box p, .evidence-box li {
+			color: #4b5b70;
+			font-size: 0.84rem;
+			line-height: 1.48;
+		}
+
+		.evidence-box p { margin: 0; }
+		.evidence-box ul { margin: 0; padding-left: 17px; }
+
+		.reviewer-notes {
+			margin-top: 12px;
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+			gap: 10px;
+		}
+
+		.summary-panel {
+			margin-top: 20px;
+			padding: 20px;
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) minmax(280px, 0.55fr);
+			gap: 18px;
+		}
+
+		.summary-panel h3 {
+			margin: 0 0 10px;
+			color: var(--navy);
+		}
+
+		.summary-output {
+			white-space: pre-wrap;
+			color: #35445a;
+			line-height: 1.58;
+			min-height: 140px;
+			background: #fbfcfe;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			padding: 14px;
+		}
+
+		.checklist {
+			display: grid;
+			gap: 10px;
+		}
+
+		.check-item {
+			display: flex;
+			gap: 10px;
+			align-items: flex-start;
+			color: #43536a;
+			font-size: 0.9rem;
+			line-height: 1.45;
+		}
+
+		.check-item input { margin-top: 3px; }
+
+		.pill {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			border-radius: 999px;
+			padding: 5px 9px;
+			color: var(--navy);
+			background: var(--surface-soft);
+			font-weight: 800;
+			font-size: 0.78rem;
+		}
+
+		.privacy-note {
+			display: flex;
+			gap: 10px;
+			align-items: flex-start;
+			padding: 12px;
+			border-radius: 8px;
+			background: #fff7ed;
+			color: #7a3d00;
+			font-size: 0.86rem;
+			line-height: 1.45;
+		}
+
+		.loading {
+			position: fixed;
+			inset: 0;
+			display: none;
+			place-items: center;
+			background: rgba(246, 248, 251, 0.72);
+			backdrop-filter: blur(8px);
+			z-index: 50;
+		}
+
+		.loading.visible { display: grid; }
+
+		.loader-box {
+			width: min(92vw, 420px);
+			background: white;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			padding: 24px;
+			box-shadow: var(--shadow);
+			text-align: center;
+		}
+
+		.spinner {
+			width: 36px;
+			height: 36px;
+			border-radius: 50%;
+			border: 4px solid #dbe5ef;
+			border-top-color: var(--teal);
+			margin: 0 auto 14px;
+			animation: spin 900ms linear infinite;
+		}
+
+		@keyframes spin { to { transform: rotate(360deg); } }
+
+		@media (max-width: 980px) {
+			.hero, .upload-panel, .dashboard-grid, .summary-panel {
+				grid-template-columns: 1fr;
+			}
+
+			.hero { padding-top: 34px; }
+			.hero-points { grid-template-columns: 1fr; }
+		}
+
+		@media (max-width: 720px) {
+			.topbar { padding: 0 16px; }
+			.topbar-actions .ghost-btn { display: none; }
+			.hero, .upload-band, .workspace { padding-left: 16px; padding-right: 16px; }
+			.axis-head { grid-template-columns: 1fr; }
+			.evidence-grid, .reviewer-notes { grid-template-columns: 1fr; }
+			.score-summary { grid-template-columns: 1fr; }
+		}
+	</style>
+</head>
+<body>
+	<div class="app-shell">
+		<header class="topbar">
+			<div class="brand">
+				<div class="brand-mark"><i data-lucide="brain-circuit" aria-hidden="true"></i></div>
+				<span>AI Builder Evaluation Workbench</span>
+			</div>
+			<div class="topbar-actions">
+				<button class="ghost-btn" id="loadSampleBtn"><i data-lucide="file-text"></i>샘플 로드</button>
+				<button class="icon-btn" id="resetBtn" title="초기화"><i data-lucide="rotate-ccw"></i></button>
+			</div>
+		</header>
+
+		<main>
+			<section class="hero" aria-labelledby="pageTitle">
+				<div class="hero-copy">
+					<h1 id="pageTitle">AI Builder 평가 페이지</h1>
+					<p>Resume PDF를 업로드하면 KPMG AI Builder 역할 기준에 맞춰 6개 역량 축의 근거를 추출하고, 정량 점수와 평가자 calibration 화면을 제공합니다.</p>
+					<div class="hero-points" aria-label="주요 기능">
+						<div class="point"><strong>Resume-grounded RAG</strong><span>레쥬메 문장을 축별로 검색해 근거를 먼저 분리합니다.</span></div>
+						<div class="point"><strong>6-axis scoring</strong><span>0~10점으로 점수화하고 6각형 차트로 비교합니다.</span></div>
+						<div class="point"><strong>Human calibration</strong><span>애매한 부분은 평가자가 점수와 코멘트를 조정합니다.</span></div>
+					</div>
+				</div>
+				<div class="hero-visual" aria-hidden="true">
+					<div class="illustration">
+						<div class="screen">
+							<div class="screen-line"></div>
+							<div class="screen-line"></div>
+							<div class="screen-line"></div>
+							<div class="screen-line"></div>
+							<canvas class="mini-radar" id="miniRadar" width="180" height="180"></canvas>
+						</div>
+						<div class="floating-chip"><i data-lucide="scan-search"></i>Evidence first</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="upload-band" aria-label="Resume upload">
+				<div class="upload-panel">
+					<label class="dropzone" id="dropzone">
+						<input id="pdfInput" type="file" accept="application/pdf" />
+						<div>
+							<div class="drop-icon"><i data-lucide="upload-cloud"></i></div>
+							<h2>Resume PDF 업로드</h2>
+							<p>PDF 파일을 선택하거나 이 영역에 드롭하세요. 분석은 브라우저에서 텍스트를 추출한 뒤 시작됩니다.</p>
+							<span class="secondary-btn"><i data-lucide="folder-open"></i>PDF 선택</span>
+							<div class="status-line" id="fileStatus">아직 파일이 선택되지 않았습니다.</div>
+						</div>
+					</label>
+
+					<div class="control-panel">
+						<div class="field">
+							<label for="apiKey">OpenAI API Key <span class="hint">브라우저 세션에서만 사용</span></label>
+							<input id="apiKey" type="password" autocomplete="off" placeholder="sk-..." />
+						</div>
+						<div class="field">
+							<label for="modelSelect">Model</label>
+							<select id="modelSelect">
+								<option value="gpt-4.1-mini">gpt-4.1-mini</option>
+								<option value="gpt-4.1">gpt-4.1</option>
+								<option value="gpt-4o-mini">gpt-4o-mini</option>
+							</select>
+						</div>
+						<div class="privacy-note">
+							<i data-lucide="shield-alert"></i>
+							<span>데모 목적의 프론트엔드 프로토타입입니다. 실제 운영에서는 API 키와 Resume 원문을 브라우저에서 직접 OpenAI로 보내지 말고 Netlify Function 같은 서버 프록시와 보안 검토를 사용하세요.</span>
+						</div>
+						<div class="action-row">
+							<button class="primary-btn" id="analyzeBtn"><i data-lucide="sparkles"></i>분석 시작</button>
+							<button class="secondary-btn" id="demoAnalyzeBtn"><i data-lucide="wand-sparkles"></i>샘플 분석</button>
+						</div>
+						<div class="status-line" id="analysisStatus">PDF를 올리거나 샘플 분석을 실행하세요.</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="workspace" id="workspace" aria-label="Evaluation dashboard">
+				<div class="section-title">
+					<div>
+						<h2>Evaluation Dashboard</h2>
+						<p>AI 제안 점수는 시작점입니다. 평가자는 근거와 불확실성을 보고 조정할 수 있습니다.</p>
+					</div>
+					<button class="secondary-btn" id="copySummaryBtn"><i data-lucide="copy"></i>요약 복사</button>
+				</div>
+
+				<div class="dashboard-grid">
+					<div class="panel chart-panel">
+						<canvas id="radarChart" width="380" height="380" aria-label="6 axis hexagon chart"></canvas>
+						<div class="score-summary">
+							<div class="summary-tile"><span>Average</span><strong id="avgScore">0.0</strong></div>
+							<div class="summary-tile"><span>Confidence</span><strong id="confidenceScore">-</strong></div>
+							<div class="summary-tile"><span>Recommendation</span><strong id="recommendationText">-</strong></div>
+						</div>
+					</div>
+					<div class="axis-list" id="axisList"></div>
+				</div>
+
+				<div class="panel summary-panel">
+					<div>
+						<h3>최종 평가 요약</h3>
+						<div class="summary-output" id="finalSummary">분석 결과가 여기에 표시됩니다.</div>
+					</div>
+					<div>
+						<h3>Responsible AI Check</h3>
+						<div class="checklist">
+							<label class="check-item"><input type="checkbox" checked /> AI 점수만으로 합격/불합격을 결정하지 않음</label>
+							<label class="check-item"><input type="checkbox" checked /> 학교/회사 브랜드보다 수행 내용과 근거를 우선함</label>
+							<label class="check-item"><input type="checkbox" checked /> 정보 부족 항목은 follow-up 질문으로 연결함</label>
+							<label class="check-item"><input type="checkbox" /> 복수 평가자 calibration 완료</label>
+							<label class="check-item"><input type="checkbox" /> 개인정보 처리 및 보관 정책 확인</label>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+	</div>
+
+	<div class="loading" id="loading">
+		<div class="loader-box">
+			<div class="spinner"></div>
+			<strong id="loadingTitle">Resume 분석 중</strong>
+			<p class="hint" id="loadingText">PDF 텍스트 추출, 축별 근거 검색, 정량 점수 산출을 진행하고 있습니다.</p>
+		</div>
+	</div>
+
+	<script type="module">
+		const pdfjsLib = await import("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs");
+		pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
+
+		const axisDefinitions = [
+			{
+				id: "problemFraming",
+				label: "Problem Framing",
+				short: "Ambiguity Handling",
+				description: "모호한 enterprise 문제를 구조화하고 해결 가능한 범위로 좁히는 능력",
+				keywords: ["ambiguous", "discovery", "scoped", "roadmap", "strategy", "pain point", "requirements", "problem", "hypothesis", "workshop", "framing", "prioritized"]
+			},
+			{
+				id: "practicalBuilding",
+				label: "Practical Building",
+				short: "Execution",
+				description: "아이디어를 실제 작동하는 prototype, workflow, automation, system으로 만드는 능력",
+				keywords: ["built", "launched", "deployed", "prototype", "automation", "dashboard", "api", "workflow", "tool", "mvp", "production", "integration", "shipped"]
+			},
+			{
+				id: "aiLeverage",
+				label: "AI Leverage",
+				short: "Technical Fluency",
+				description: "LLM, agent, RAG, prompt, evaluation 등을 실용적으로 적용하는 능력",
+				keywords: ["ai", "llm", "rag", "agent", "openai", "prompt", "model", "machine learning", "embedding", "evaluation", "automation", "copilot", "chatgpt"]
+			},
+			{
+				id: "enterpriseJudgment",
+				label: "Enterprise Judgment",
+				short: "Governance",
+				description: "보안, 개인정보, 리스크, 확장성, 운영 현실을 고려하는 판단력",
+				keywords: ["security", "privacy", "governance", "compliance", "risk", "regulated", "audit", "monitoring", "scale", "production", "enterprise", "controls"]
+			},
+			{
+				id: "stakeholderThinking",
+				label: "Stakeholder Thinking",
+				short: "User-centered",
+				description: "사용자, 비즈니스, 기술, 리스크 이해관계자의 요구를 균형 있게 다루는 능력",
+				keywords: ["stakeholder", "client", "user", "cross-functional", "workshop", "interview", "training", "adoption", "collaborated", "business", "operations", "design"]
+			},
+			{
+				id: "communicationGrowth",
+				label: "Communication & Growth",
+				short: "Learning Agility",
+				description: "복잡한 내용을 설명하고 빠르게 배우며 성장한 증거",
+				keywords: ["presented", "documented", "trained", "wrote", "communicated", "self-taught", "learned", "mentored", "leadership", "published", "demo", "case study"]
+			}
+		];
+
+		const jobContext = `KPMG AI Builder role: hands-on builders who sit at the intersection of enterprise operations, technology, and design. They identify pain points where agentic AI creates tangible value, build agents/plugins/skills/tools, own the lifecycle from prototype to production, work with enterprise platforms and data sources, design evaluations, account for human-AI handoffs, operate in ambiguity, and treat risk, governance, ethics, and trust as design constraints.`;
+
+		const sampleResume = `
+Alex Morgan
+AI Product Builder and Operations Technologist
+
+Experience
+- Built a working LLM document review workflow for a consulting operations team, reducing manual triage time by 35% across a pilot group of 18 users.
+- Scoped the MVP from an ambiguous request to improve knowledge search. Ran discovery sessions with managers, analysts, legal, and IT to define safe boundaries and human approval steps.
+- Implemented a lightweight RAG prototype using OpenAI APIs, internal policy documents, prompt templates, and a reviewer feedback loop. Measured answer quality with sampled human ratings and tracked hallucination patterns.
+- Created a dashboard that showed usage, flagged low-confidence answers, and routed sensitive cases to human reviewers.
+- Partnered with security and data governance teams to avoid storing confidential prompts in logs and documented retention assumptions for the pilot.
+- Presented demo outcomes to senior stakeholders and wrote onboarding notes for non-technical users.
+- Previously worked in operations improvement and self-taught Python, JavaScript, API integration, and prompt evaluation through internal projects.
+
+Projects
+- Prototype portfolio: workflow automation tool, AI support intake classifier, and prompt evaluation spreadsheet.
+- Led workshops to identify pain points and prioritize automations based on impact, risk, and feasibility.
+`;
+
+		const state = {
+			resumeText: "",
+			fileName: "",
+			results: []
+		};
+
+		const elements = {
+			pdfInput: document.getElementById("pdfInput"),
+			dropzone: document.getElementById("dropzone"),
+			fileStatus: document.getElementById("fileStatus"),
+			apiKey: document.getElementById("apiKey"),
+			modelSelect: document.getElementById("modelSelect"),
+			analyzeBtn: document.getElementById("analyzeBtn"),
+			demoAnalyzeBtn: document.getElementById("demoAnalyzeBtn"),
+			loadSampleBtn: document.getElementById("loadSampleBtn"),
+			resetBtn: document.getElementById("resetBtn"),
+			analysisStatus: document.getElementById("analysisStatus"),
+			workspace: document.getElementById("workspace"),
+			axisList: document.getElementById("axisList"),
+			avgScore: document.getElementById("avgScore"),
+			confidenceScore: document.getElementById("confidenceScore"),
+			recommendationText: document.getElementById("recommendationText"),
+			finalSummary: document.getElementById("finalSummary"),
+			copySummaryBtn: document.getElementById("copySummaryBtn"),
+			loading: document.getElementById("loading"),
+			loadingText: document.getElementById("loadingText")
+		};
+
+		function setStatus(message) {
+			elements.analysisStatus.textContent = message;
+		}
+
+		function setLoading(isLoading, message = "PDF 텍스트 추출, 축별 근거 검색, 정량 점수 산출을 진행하고 있습니다.") {
+			elements.loading.classList.toggle("visible", isLoading);
+			elements.loadingText.textContent = message;
+		}
+
+		async function extractPdfText(file) {
+			const arrayBuffer = await file.arrayBuffer();
+			const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+			const pages = [];
+			for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+				const page = await pdf.getPage(pageNumber);
+				const content = await page.getTextContent();
+				const text = content.items.map((item) => item.str).join(" ");
+				pages.push(text);
+			}
+			return pages.join("\n\n").replace(/\s+/g, " ").trim();
+		}
+
+		function chunkResume(text) {
+			const roughChunks = text
+				.split(/(?<=[.!?])\s+|\n+|•|- /)
+				.map((part) => part.trim())
+				.filter((part) => part.length > 24);
+			return roughChunks.length ? roughChunks : [text.slice(0, 900)];
+		}
+
+		function retrieveEvidence(text, axis) {
+			const chunks = chunkResume(text);
+			return chunks
+				.map((chunk) => {
+					const lower = chunk.toLowerCase();
+					const keywordHits = axis.keywords.filter((keyword) => lower.includes(keyword.toLowerCase())).length;
+					const actionHits = ["built", "led", "created", "implemented", "designed", "deployed", "owned", "improved", "reduced", "increased", "measured"].filter((word) => lower.includes(word)).length;
+					return { chunk, score: keywordHits * 2 + actionHits };
+				})
+				.filter((item) => item.score > 0)
+				.sort((a, b) => b.score - a.score)
+				.slice(0, 4)
+				.map((item) => item.chunk);
+		}
+
+		function localAnalyze(text) {
+			return axisDefinitions.map((axis) => {
+				const evidence = retrieveEvidence(text, axis);
+				const evidenceText = evidence.join(" ").toLowerCase();
+				const ownership = ["led", "owned", "built", "created", "implemented", "designed"].filter((word) => evidenceText.includes(word)).length;
+				const impact = ["reduced", "increased", "%", "users", "deployed", "production", "pilot", "measured"].filter((word) => evidenceText.includes(word)).length;
+				const governance = ["risk", "privacy", "security", "governance", "human", "approval", "confidence"].filter((word) => evidenceText.includes(word)).length;
+				const rawScore = evidence.length * 1.25 + ownership * 0.9 + impact * 0.65 + governance * 0.35;
+				const score = Math.max(2, Math.min(9.2, Number(rawScore.toFixed(1))));
+				const confidence = evidence.length >= 3 ? "High" : evidence.length >= 1 ? "Medium" : "Low";
+				return {
+					id: axis.id,
+					label: axis.label,
+					short: axis.short,
+					score,
+					confidence,
+					evidence: evidence.length ? evidence : ["Resume에서 직접적인 근거가 부족합니다."],
+					rationale: evidence.length ? `${axis.description}에 연결되는 resume 문장이 확인되었습니다. 구체적인 ownership과 impact 여부를 기준으로 예비 점수를 산출했습니다.` : `해당 축은 resume 정보만으로 판단하기 어렵습니다. 낮은 확신도로 표시하고 인터뷰에서 확인해야 합니다.`,
+					concern: evidence.length >= 2 ? "근거는 있으나 실제 역할 범위와 운영 수준은 추가 확인이 필요합니다." : "근거가 제한적이므로 점수보다 follow-up 질문이 중요합니다.",
+					followUp: makeFollowUp(axis.id),
+					reviewerScore: score,
+					reviewerNote: ""
+				};
+			});
+		}
+
+		function makeFollowUp(axisId) {
+			const questions = {
+				problemFraming: "처음 문제가 모호했을 때 어떤 가정을 세웠고, 무엇을 의도적으로 범위에서 제외했나요?",
+				practicalBuilding: "직접 만든 artifact의 핵심 기능과 사용자가 실제로 사용한 증거를 설명해 주세요.",
+				aiLeverage: "AI 출력 품질과 hallucination 위험을 어떤 방식으로 평가했나요?",
+				enterpriseJudgment: "보안, 개인정보, governance 제약을 설계에 어떻게 반영했나요?",
+				stakeholderThinking: "서로 다른 stakeholder 요구가 충돌했을 때 어떤 tradeoff를 선택했나요?",
+				communicationGrowth: "새로운 도메인이나 기술을 빠르게 배워 적용한 가장 구체적인 사례는 무엇인가요?"
+			};
+			return questions[axisId];
+		}
+
+		function buildPrompt(text, retrieved) {
+			return `You are evaluating an AI Builder candidate for KPMG Canada. Use only the resume and retrieved evidence below. Do not use school prestige, company brand prestige, age, gender, nationality, address, or other irrelevant demographic signals. If evidence is missing, lower confidence and propose follow-up questions instead of inventing facts.
+
+Job context:
+${jobContext}
+
+Evaluation axes:
+${axisDefinitions.map((axis) => `- ${axis.id}: ${axis.label} (${axis.short}) - ${axis.description}`).join("\n")}
+
+Retrieved resume evidence by axis:
+${JSON.stringify(retrieved, null, 2)}
+
+Resume text:
+${text.slice(0, 12000)}
+
+Return strict JSON only. Shape:
+{
+	"axes": [
+		{"id":"problemFraming","score":0-10,"confidence":"High|Medium|Low","evidence":["quote"],"rationale":"string","concern":"string","followUp":"string"}
+	],
+	"overallSummary":"string"
+}`;
+		}
+
+		async function openAiAnalyze(text) {
+			const apiKey = elements.apiKey.value.trim();
+			if (!apiKey) return null;
+
+			const retrieved = Object.fromEntries(axisDefinitions.map((axis) => [axis.id, retrieveEvidence(text, axis)]));
+			const response = await fetch("https://api.openai.com/v1/responses", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${apiKey}`
+				},
+				body: JSON.stringify({
+					model: elements.modelSelect.value,
+					input: buildPrompt(text, retrieved),
+					temperature: 0.2
+				})
+			});
+
+			if (!response.ok) {
+				const errorText = await response.text();
+				throw new Error(errorText || "OpenAI request failed");
+			}
+
+			const data = await response.json();
+			const outputText = data.output_text || data.output?.flatMap((item) => item.content || []).map((content) => content.text || "").join("\n") || "";
+			const jsonText = outputText.replace(/^```json\s*/i, "").replace(/```$/i, "").trim();
+			const parsed = JSON.parse(jsonText);
+			return axisDefinitions.map((axis) => {
+				const match = parsed.axes.find((item) => item.id === axis.id) || {};
+				const score = Number.isFinite(Number(match.score)) ? Math.max(0, Math.min(10, Number(match.score))) : 5;
+				return {
+					id: axis.id,
+					label: axis.label,
+					short: axis.short,
+					score,
+					confidence: match.confidence || "Medium",
+					evidence: Array.isArray(match.evidence) && match.evidence.length ? match.evidence : retrieveEvidence(text, axis),
+					rationale: match.rationale || axis.description,
+					concern: match.concern || "추가 human review가 필요합니다.",
+					followUp: match.followUp || makeFollowUp(axis.id),
+					reviewerScore: score,
+					reviewerNote: ""
+				};
+			});
+		}
+
+		function renderResults(results) {
+			state.results = results;
+			elements.workspace.classList.add("visible");
+			elements.axisList.innerHTML = results.map((result) => `
+				<article class="panel axis-item" data-axis="${result.id}">
+					<div class="axis-head">
+						<div class="axis-title">
+							<strong>${result.label}</strong>
+							<span>${result.short} · <span class="pill">${result.confidence} confidence</span></span>
+						</div>
+						<div class="score-badge" id="badge-${result.id}">${formatScore(result.reviewerScore)}</div>
+						<input aria-label="${result.label} reviewer score" type="range" min="0" max="10" step="0.1" value="${result.reviewerScore}" data-score-slider="${result.id}" />
+					</div>
+					<div class="evidence-grid">
+						<div class="evidence-box">
+							<strong>RAG evidence</strong>
+							<ul>${result.evidence.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+						</div>
+						<div class="evidence-box">
+							<strong>Rationale</strong>
+							<p>${escapeHtml(result.rationale)}</p>
+						</div>
+						<div class="evidence-box">
+							<strong>Concern</strong>
+							<p>${escapeHtml(result.concern)}</p>
+						</div>
+						<div class="evidence-box">
+							<strong>Follow-up question</strong>
+							<p>${escapeHtml(result.followUp)}</p>
+						</div>
+					</div>
+					<div class="reviewer-notes">
+						<div class="field">
+							<label for="note-${result.id}">Calibration note</label>
+							<textarea id="note-${result.id}" data-note="${result.id}" placeholder="평가자가 점수를 조정한 이유나 인터뷰에서 확인할 내용을 적으세요."></textarea>
+						</div>
+						<div class="field">
+							<label for="decision-${result.id}">Reviewer signal</label>
+							<select id="decision-${result.id}" data-decision="${result.id}">
+								<option>Keep AI suggestion</option>
+								<option>Increase after evidence review</option>
+								<option>Decrease after evidence review</option>
+								<option>Needs interview calibration</option>
+							</select>
+						</div>
+					</div>
+				</article>
+			`).join("");
+
+			elements.axisList.querySelectorAll("[data-score-slider]").forEach((slider) => {
+				slider.addEventListener("input", (event) => {
+					const id = event.target.dataset.scoreSlider;
+					const result = state.results.find((item) => item.id === id);
+					result.reviewerScore = Number(event.target.value);
+					document.getElementById(`badge-${id}`).textContent = formatScore(result.reviewerScore);
+					updateSummary();
+					drawRadarChart();
+				});
+			});
+
+			elements.axisList.querySelectorAll("[data-note]").forEach((note) => {
+				note.addEventListener("input", (event) => {
+					const result = state.results.find((item) => item.id === event.target.dataset.note);
+					result.reviewerNote = event.target.value;
+					updateSummary();
+				});
+			});
+
+			updateSummary();
+			drawRadarChart();
+			elements.workspace.scrollIntoView({ behavior: "smooth", block: "start" });
+		}
+
+		function updateSummary() {
+			const scores = state.results.map((item) => item.reviewerScore);
+			const average = scores.length ? scores.reduce((sum, score) => sum + score, 0) / scores.length : 0;
+			const confidenceRank = { High: 3, Medium: 2, Low: 1 };
+			const confidenceAverage = state.results.reduce((sum, item) => sum + (confidenceRank[item.confidence] || 2), 0) / Math.max(1, state.results.length);
+			const confidence = confidenceAverage >= 2.65 ? "High" : confidenceAverage >= 1.7 ? "Medium" : "Low";
+			const recommendation = average >= 8 ? "Strong Yes" : average >= 6.7 ? "Yes" : average >= 5.2 ? "Maybe" : "No";
+			const strengths = [...state.results].sort((a, b) => b.reviewerScore - a.reviewerScore).slice(0, 2);
+			const concerns = [...state.results].sort((a, b) => a.reviewerScore - b.reviewerScore).slice(0, 2);
+			const adjusted = state.results.filter((item) => item.reviewerNote.trim()).map((item) => `- ${item.label}: ${item.reviewerNote.trim()}`);
+
+			elements.avgScore.textContent = average.toFixed(1);
+			elements.confidenceScore.textContent = confidence;
+			elements.recommendationText.textContent = recommendation;
+			elements.finalSummary.textContent = `Recommendation: ${recommendation}\nAverage score: ${average.toFixed(1)} / 10\nConfidence: ${confidence}\n\nTop strengths:\n${strengths.map((item) => `- ${item.label}: ${formatScore(item.reviewerScore)}. ${item.rationale}`).join("\n")}\n\nMain concerns:\n${concerns.map((item) => `- ${item.label}: ${item.concern}`).join("\n")}\n\nInterview follow-up:\n${concerns.map((item) => `- ${item.followUp}`).join("\n")}\n\nReviewer calibration notes:\n${adjusted.length ? adjusted.join("\n") : "- No reviewer adjustments recorded yet."}\n\nGovernance note: This output supports human review only. It should not be used as an automated hiring decision.`;
+		}
+
+		function drawRadarChart() {
+			const canvas = document.getElementById("radarChart");
+			drawRadar(canvas, state.results.map((item) => item.reviewerScore), axisDefinitions.map((axis) => axis.label), true);
+		}
+
+		function drawRadar(canvas, values, labels, withLabels = false) {
+			const context = canvas.getContext("2d");
+			const width = canvas.width;
+			const height = canvas.height;
+			const centerX = width / 2;
+			const centerY = height / 2;
+			const radius = Math.min(width, height) * (withLabels ? 0.32 : 0.38);
+			context.clearRect(0, 0, width, height);
+			context.lineWidth = 1;
+			context.font = "12px Inter, sans-serif";
+
+			for (let ring = 1; ring <= 5; ring += 1) {
+				const ringRadius = (radius / 5) * ring;
+				context.beginPath();
+				for (let index = 0; index < 6; index += 1) {
+					const angle = -Math.PI / 2 + (Math.PI * 2 * index) / 6;
+					const x = centerX + Math.cos(angle) * ringRadius;
+					const y = centerY + Math.sin(angle) * ringRadius;
+					if (index === 0) context.moveTo(x, y);
+					else context.lineTo(x, y);
+				}
+				context.closePath();
+				context.strokeStyle = ring === 5 ? "#9fb2c8" : "#d9e1ea";
+				context.stroke();
+			}
+
+			for (let index = 0; index < 6; index += 1) {
+				const angle = -Math.PI / 2 + (Math.PI * 2 * index) / 6;
+				context.beginPath();
+				context.moveTo(centerX, centerY);
+				context.lineTo(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius);
+				context.strokeStyle = "#d9e1ea";
+				context.stroke();
+			}
+
+			const safeValues = values.length === 6 ? values : [7.5, 6.5, 8, 5.5, 7, 6];
+			context.beginPath();
+			safeValues.forEach((value, index) => {
+				const angle = -Math.PI / 2 + (Math.PI * 2 * index) / 6;
+				const pointRadius = radius * (value / 10);
+				const x = centerX + Math.cos(angle) * pointRadius;
+				const y = centerY + Math.sin(angle) * pointRadius;
+				if (index === 0) context.moveTo(x, y);
+				else context.lineTo(x, y);
+			});
+			context.closePath();
+			context.fillStyle = "rgba(0, 124, 137, 0.22)";
+			context.strokeStyle = "#007c89";
+			context.lineWidth = 3;
+			context.fill();
+			context.stroke();
+
+			if (withLabels) {
+				labels.forEach((label, index) => {
+					const angle = -Math.PI / 2 + (Math.PI * 2 * index) / 6;
+					const x = centerX + Math.cos(angle) * (radius + 54);
+					const y = centerY + Math.sin(angle) * (radius + 38);
+					context.fillStyle = "#17324d";
+					context.textAlign = x < centerX - 10 ? "right" : x > centerX + 10 ? "left" : "center";
+					context.fillText(label.replace(" & ", " + "), x, y);
+				});
+			}
+		}
+
+		function formatScore(score) {
+			return Number(score).toFixed(1);
+		}
+
+		function escapeHtml(value) {
+			return String(value).replace(/[&<>"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[character]));
+		}
+
+		async function analyzeCurrentResume(forceLocal = false) {
+			const text = state.resumeText.trim();
+			if (!text) {
+				setStatus("먼저 PDF를 올리거나 샘플을 로드하세요.");
+				return;
+			}
+
+			setLoading(true);
+			try {
+				let results = null;
+				if (!forceLocal && elements.apiKey.value.trim()) {
+					setLoading(true, "OpenAI API로 resume-grounded 평가를 생성하는 중입니다.");
+					results = await openAiAnalyze(text);
+					setStatus("OpenAI 분석을 완료했습니다. 점수는 평가자가 조정할 수 있습니다.");
+				}
+				if (!results) {
+					setLoading(true, "브라우저 내 RAG 휴리스틱으로 샘플 분석을 생성하는 중입니다.");
+					results = localAnalyze(text);
+					setStatus("로컬 데모 분석을 완료했습니다. API 키 없이도 워크플로우를 시연할 수 있습니다.");
+				}
+				renderResults(results);
+			} catch (error) {
+				console.error(error);
+				const fallback = localAnalyze(text);
+				renderResults(fallback);
+				setStatus("API 호출에 실패해 로컬 데모 분석으로 전환했습니다. 브라우저 콘솔에서 오류를 확인할 수 있습니다.");
+			} finally {
+				setLoading(false);
+			}
+		}
+
+		elements.pdfInput.addEventListener("change", async (event) => {
+			const file = event.target.files?.[0];
+			if (!file) return;
+			setLoading(true, "PDF 텍스트를 추출하는 중입니다.");
+			try {
+				state.fileName = file.name;
+				state.resumeText = await extractPdfText(file);
+				elements.fileStatus.textContent = `${file.name} · ${state.resumeText.length.toLocaleString()} characters extracted`;
+				setStatus("PDF 텍스트 추출 완료. 분석을 시작할 수 있습니다.");
+			} catch (error) {
+				console.error(error);
+				elements.fileStatus.textContent = "PDF 텍스트 추출에 실패했습니다.";
+				setStatus("PDF를 읽지 못했습니다. 텍스트 기반 PDF인지 확인해 주세요.");
+			} finally {
+				setLoading(false);
+			}
+		});
+
+		["dragenter", "dragover"].forEach((eventName) => {
+			elements.dropzone.addEventListener(eventName, (event) => {
+				event.preventDefault();
+				elements.dropzone.classList.add("dragover");
+			});
+		});
+
+		["dragleave", "drop"].forEach((eventName) => {
+			elements.dropzone.addEventListener(eventName, (event) => {
+				event.preventDefault();
+				elements.dropzone.classList.remove("dragover");
+			});
+		});
+
+		elements.dropzone.addEventListener("drop", (event) => {
+			const file = event.dataTransfer.files?.[0];
+			if (file && file.type === "application/pdf") {
+				const transfer = new DataTransfer();
+				transfer.items.add(file);
+				elements.pdfInput.files = transfer.files;
+				elements.pdfInput.dispatchEvent(new Event("change"));
+			}
+		});
+
+		elements.analyzeBtn.addEventListener("click", () => analyzeCurrentResume(false));
+		elements.demoAnalyzeBtn.addEventListener("click", () => {
+			state.resumeText = sampleResume;
+			state.fileName = "synthetic_sample_resume.pdf";
+			elements.fileStatus.textContent = "synthetic_sample_resume.pdf · sample data loaded";
+			analyzeCurrentResume(true);
+		});
+		elements.loadSampleBtn.addEventListener("click", () => {
+			state.resumeText = sampleResume;
+			state.fileName = "synthetic_sample_resume.pdf";
+			elements.fileStatus.textContent = "synthetic_sample_resume.pdf · sample data loaded";
+			setStatus("샘플 resume가 로드되었습니다. 샘플 분석을 실행하세요.");
+		});
+		elements.resetBtn.addEventListener("click", () => window.location.reload());
+		elements.copySummaryBtn.addEventListener("click", async () => {
+			await navigator.clipboard.writeText(elements.finalSummary.textContent);
+			setStatus("최종 평가 요약을 클립보드에 복사했습니다.");
+		});
+
+		lucide.createIcons();
+		drawRadar(document.getElementById("miniRadar"), [8, 7, 8.5, 6.8, 7.6, 7.2], ["", "", "", "", "", ""]);
+	</script>
+</body>
+</html>
 .
