@@ -1002,6 +1002,15 @@ Return strict JSON only. Shape:
 
 		function renderResults(results) {
 			state.results = results;
+			const payload = {
+				createdAt: new Date().toISOString(),
+				fileName: state.fileName || "resume.pdf",
+				resumeLength: state.resumeText.length,
+				results
+			};
+			sessionStorage.setItem("aiBuilderEvaluationResult", JSON.stringify(payload));
+			window.location.href = "analysis.html";
+			return;
 			elements.workspace.classList.add("visible");
 			elements.axisList.innerHTML = results.map((result) => `
 				<article class="panel axis-item" data-axis="${result.id}">
@@ -1264,4 +1273,3 @@ Return strict JSON only. Shape:
 	</script>
 </body>
 </html>
-.

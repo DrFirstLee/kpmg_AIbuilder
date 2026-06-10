@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>AI Builder Evaluation Analysis</title>
+	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+	<style>
+		:root {
+			--bg: #f6f8fb;
+			--surface: #ffffff;
+			--soft: #eef3f8;
+			--text: #152033;
+			--muted: #667085;
+			--line: #d9e1ea;
+			--navy: #17324d;
+			--teal: #007c89;
+			--amber: #b35c00;
+			--green: #3f7d20;
+			--red: #b42318;
+			--shadow: 0 16px 42px rgba(21, 32, 51, 0.09);
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			margin: 0;
+			font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+			background: var(--bg);
+			color: var(--text);
+		}
+
+		button, textarea, input, select { font: inherit; }
+		button { border: 0; cursor: pointer; }
+
+		.topbar {
+			height: 64px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 16px;
+			padding: 0 28px;
+			background: rgba(255, 255, 255, 0.9);
+			border-bottom: 1px solid var(--line);
+			position: sticky;
+			top: 0;
+			z-index: 10;
+			backdrop-filter: blur(16px);
+		}
+
+		.brand {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			color: var(--navy);
+			font-weight: 900;
+		}
+
+		.brand-mark {
+			width: 34px;
+			height: 34px;
+			border-radius: 8px;
+			display: grid;
+			place-items: center;
+			color: white;
+			background: linear-gradient(135deg, var(--navy), var(--teal));
+		}
+
+		.top-actions { display: flex; gap: 10px; align-items: center; }
+
+		.primary-btn, .secondary-btn, .icon-btn {
+			min-height: 40px;
+			border-radius: 8px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			font-weight: 800;
+		}
+
+		.primary-btn { padding: 0 16px; color: white; background: var(--navy); }
+		.secondary-btn { padding: 0 14px; color: var(--navy); background: var(--soft); }
+		.icon-btn { width: 40px; color: var(--navy); background: var(--soft); }
+
+		main {
+			max-width: 1240px;
+			margin: 0 auto;
+			padding: 30px 28px 48px;
+		}
+
+		.page-head {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+			gap: 20px;
+			align-items: stretch;
+			margin-bottom: 20px;
+		}
+
+		.headline {
+			padding: 26px;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			background: white;
+			box-shadow: var(--shadow);
+		}
+
+		.headline h1 {
+			margin: 0;
+			color: var(--navy);
+			font-size: clamp(2rem, 4vw, 3.8rem);
+			line-height: 1;
+			letter-spacing: 0;
+		}
+
+		.headline p {
+			margin: 14px 0 0;
+			max-width: 760px;
+			color: #47566a;
+			line-height: 1.65;
+		}
+
+		.meta-panel {
+			padding: 20px;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			background: var(--navy);
+			color: white;
+			box-shadow: var(--shadow);
+			display: grid;
+			align-content: center;
+			gap: 12px;
+		}
+
+		.meta-row {
+			display: flex;
+			justify-content: space-between;
+			gap: 14px;
+			font-size: 0.9rem;
+		}
+
+		.meta-row span { color: #c8d5e2; }
+		.meta-row strong { text-align: right; }
+
+		.kpi-grid {
+			display: grid;
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+			gap: 12px;
+			margin-bottom: 20px;
+		}
+
+		.kpi {
+			min-height: 112px;
+			padding: 18px;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			background: white;
+			box-shadow: 0 10px 28px rgba(21, 32, 51, 0.06);
+		}
+
+		.kpi span {
+			display: block;
+			color: var(--muted);
+			font-size: 0.78rem;
+			text-transform: uppercase;
+			font-weight: 900;
+		}
+
+		.kpi strong {
+			display: block;
+			margin-top: 9px;
+			color: var(--navy);
+			font-size: 1.7rem;
+		}
+
+		.kpi small {
+			display: block;
+			margin-top: 6px;
+			color: #53647a;
+			line-height: 1.35;
+		}
+
+		.main-grid {
+			display: grid;
+			grid-template-columns: minmax(340px, 430px) minmax(0, 1fr);
+			gap: 20px;
+			align-items: start;
+		}
+
+		.panel {
+			background: white;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			box-shadow: 0 10px 28px rgba(21, 32, 51, 0.06);
+		}
+
+		.chart-panel { padding: 20px; position: sticky; top: 84px; }
+
+		.legend {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 8px;
+			margin-top: 14px;
+		}
+
+		.legend-item {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			color: #47566a;
+			font-size: 0.86rem;
+			font-weight: 700;
+		}
+
+		.dot {
+			width: 11px;
+			height: 11px;
+			border-radius: 50%;
+			background: var(--teal);
+		}
+
+		.dot.average { background: var(--amber); }
+		.dot.peer { background: var(--navy); }
+
+		.axis-list { display: grid; gap: 12px; }
+
+		.axis-card { padding: 16px; }
+
+		.axis-header {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) 74px 150px;
+			gap: 12px;
+			align-items: center;
+		}
+
+		.axis-title strong {
+			display: block;
+			color: var(--navy);
+			font-size: 1rem;
+		}
+
+		.axis-title span {
+			display: block;
+			margin-top: 4px;
+			color: var(--muted);
+			font-size: 0.84rem;
+			line-height: 1.4;
+		}
+
+		.score-badge {
+			min-width: 62px;
+			border-radius: 8px;
+			padding: 9px 10px;
+			text-align: center;
+			color: white;
+			background: var(--teal);
+			font-weight: 900;
+		}
+
+		input[type="range"] { width: 100%; }
+
+		.compare-bars {
+			display: grid;
+			gap: 8px;
+			margin-top: 14px;
+		}
+
+		.bar-row {
+			display: grid;
+			grid-template-columns: 116px minmax(0, 1fr) 42px;
+			gap: 10px;
+			align-items: center;
+			font-size: 0.84rem;
+			color: #46566b;
+		}
+
+		.bar-track {
+			height: 10px;
+			border-radius: 99px;
+			background: #e5ebf2;
+			overflow: hidden;
+		}
+
+		.bar-fill {
+			height: 100%;
+			border-radius: 99px;
+			background: var(--teal);
+			width: 0;
+		}
+
+		.bar-fill.average { background: var(--amber); }
+		.bar-fill.peer { background: var(--navy); }
+
+		.detail-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 10px;
+			margin-top: 14px;
+		}
+
+		.detail-box {
+			min-height: 86px;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			background: #fbfcfe;
+			padding: 11px;
+		}
+
+		.detail-box strong {
+			display: block;
+			margin-bottom: 7px;
+			color: var(--navy);
+			font-size: 0.82rem;
+		}
+
+		.detail-box p, .detail-box li {
+			margin: 0;
+			color: #4b5b70;
+			font-size: 0.84rem;
+			line-height: 1.48;
+		}
+
+		.detail-box ul { margin: 0; padding-left: 18px; }
+
+		.peer-panel {
+			margin-top: 14px;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			overflow: hidden;
+		}
+
+		.peer-head {
+			display: flex;
+			justify-content: space-between;
+			gap: 12px;
+			padding: 10px 12px;
+			background: var(--soft);
+			color: var(--navy);
+			font-weight: 900;
+			font-size: 0.86rem;
+		}
+
+		.peer-grid {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 1px;
+			background: var(--line);
+		}
+
+		.peer-card {
+			background: white;
+			padding: 12px;
+			min-height: 116px;
+		}
+
+		.peer-card strong {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 8px;
+			color: var(--navy);
+			font-size: 0.86rem;
+		}
+
+		.peer-card p {
+			margin: 8px 0 0;
+			color: #4b5b70;
+			font-size: 0.82rem;
+			line-height: 1.45;
+		}
+
+		.calibration-note {
+			margin-top: 12px;
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) 170px;
+			gap: 10px;
+		}
+
+		textarea, select {
+			width: 100%;
+			border: 1px solid #cbd7e3;
+			border-radius: 8px;
+			padding: 11px;
+			outline: none;
+			background: white;
+			color: var(--text);
+		}
+
+		textarea { min-height: 82px; resize: vertical; }
+
+		.summary-panel {
+			margin-top: 20px;
+			padding: 20px;
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) minmax(300px, 0.55fr);
+			gap: 18px;
+		}
+
+		.summary-panel h2, .summary-panel h3 {
+			margin: 0 0 10px;
+			color: var(--navy);
+		}
+
+		.summary-output {
+			white-space: pre-wrap;
+			min-height: 180px;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			background: #fbfcfe;
+			color: #35445a;
+			line-height: 1.58;
+			padding: 14px;
+		}
+
+		.checklist { display: grid; gap: 10px; }
+
+		.check-item {
+			display: flex;
+			gap: 10px;
+			align-items: flex-start;
+			color: #43536a;
+			font-size: 0.9rem;
+			line-height: 1.45;
+		}
+
+		.pill {
+			display: inline-flex;
+			align-items: center;
+			border-radius: 999px;
+			padding: 5px 9px;
+			background: var(--soft);
+			color: var(--navy);
+			font-size: 0.76rem;
+			font-weight: 900;
+		}
+
+		.positive { color: var(--green); }
+		.negative { color: var(--red); }
+
+		@media (max-width: 980px) {
+			.page-head, .main-grid, .summary-panel { grid-template-columns: 1fr; }
+			.chart-panel { position: static; }
+			.kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+		}
+
+		@media (max-width: 720px) {
+			.topbar { padding: 0 16px; }
+			.top-actions .secondary-btn { display: none; }
+			main { padding-left: 16px; padding-right: 16px; }
+			.kpi-grid, .axis-header, .detail-grid, .peer-grid, .calibration-note { grid-template-columns: 1fr; }
+			.bar-row { grid-template-columns: 94px minmax(0, 1fr) 38px; }
+		}
+	</style>
+</head>
+<body>
+	<header class="topbar">
+		<div class="brand">
+			<div class="brand-mark"><i data-lucide="radar" aria-hidden="true"></i></div>
+			<span>AI Builder Evaluation Analysis</span>
+		</div>
+		<div class="top-actions">
+			<button class="secondary-btn" id="backBtn"><i data-lucide="arrow-left"></i>업로드로 돌아가기</button>
+			<button class="primary-btn" id="copyBtn"><i data-lucide="copy"></i>요약 복사</button>
+		</div>
+	</header>
+
+	<main>
+		<section class="page-head">
+			<div class="headline">
+				<h1>분석 결과</h1>
+				<p>업로드 화면은 숨기고, Resume 기반 6개 평가 축의 결과만 보여줍니다. 후보자 점수는 dummy 평균 데이터 및 익명화된 타 평가자 샘플과 함께 비교됩니다.</p>
+			</div>
+			<aside class="meta-panel">
+				<div class="meta-row"><span>Resume</span><strong id="fileName">-</strong></div>
+				<div class="meta-row"><span>Extracted text</span><strong id="resumeLength">-</strong></div>
+				<div class="meta-row"><span>Generated</span><strong id="createdAt">-</strong></div>
+			</aside>
+		</section>
+
+		<section class="kpi-grid" aria-label="Summary metrics">
+			<div class="kpi"><span>Candidate Avg</span><strong id="candidateAvg">0.0</strong><small>평가자 calibration 반영 점수</small></div>
+			<div class="kpi"><span>Benchmark Avg</span><strong id="benchmarkAvg">0.0</strong><small>dummy 평균 후보군 데이터</small></div>
+			<div class="kpi"><span>Delta</span><strong id="deltaAvg">0.0</strong><small>후보자 평균 - benchmark 평균</small></div>
+			<div class="kpi"><span>Recommendation</span><strong id="recommendation">-</strong><small>자동 결정이 아닌 review aid</small></div>
+		</section>
+
+		<section class="main-grid">
+			<aside class="panel chart-panel">
+				<canvas id="radarChart" width="390" height="390" aria-label="Candidate versus benchmark radar chart"></canvas>
+				<div class="legend">
+					<div class="legend-item"><span class="dot"></span>Candidate</div>
+					<div class="legend-item"><span class="dot average"></span>Dummy average</div>
+					<div class="legend-item"><span class="dot peer"></span>Anonymous reviewers</div>
+				</div>
+			</aside>
+			<div class="axis-list" id="axisList"></div>
+		</section>
+
+		<section class="panel summary-panel">
+			<div>
+				<h2>최종 평가 요약</h2>
+				<div class="summary-output" id="summaryOutput"></div>
+			</div>
+			<div>
+				<h3>Calibration Guardrails</h3>
+				<div class="checklist">
+					<label class="check-item"><input type="checkbox" checked /> AI 점수만으로 합격/불합격을 결정하지 않음</label>
+					<label class="check-item"><input type="checkbox" checked /> dummy 평균은 비교 기준이며 절대 기준이 아님</label>
+					<label class="check-item"><input type="checkbox" checked /> 타 평가자 결과는 익명화된 calibration sample로만 사용</label>
+					<label class="check-item"><input type="checkbox" checked /> 정보 부족 항목은 후속 질문으로 연결</label>
+					<label class="check-item"><input type="checkbox" /> 실제 운영 전 privacy/security review 필요</label>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<script>
+		const axisDefinitions = [
+			{ id: "problemFraming", label: "Problem Framing", short: "Ambiguity Handling" },
+			{ id: "practicalBuilding", label: "Practical Building", short: "Execution" },
+			{ id: "aiLeverage", label: "AI Leverage", short: "Technical Fluency" },
+			{ id: "enterpriseJudgment", label: "Enterprise Judgment", short: "Governance" },
+			{ id: "stakeholderThinking", label: "Stakeholder Thinking", short: "User-centered" },
+			{ id: "communicationGrowth", label: "Communication & Growth", short: "Learning Agility" }
+		];
+
+		const benchmark = {
+			problemFraming: 6.8,
+			practicalBuilding: 6.4,
+			aiLeverage: 6.2,
+			enterpriseJudgment: 5.9,
+			stakeholderThinking: 6.5,
+			communicationGrowth: 6.7
+		};
+
+		const peerReviews = {
+			problemFraming: [
+				{ reviewer: "Reviewer A", score: 7.2, note: "Strong scoping signals, but would probe assumption-setting." },
+				{ reviewer: "Reviewer B", score: 7.8, note: "Good ambiguity handling from discovery and MVP framing." },
+				{ reviewer: "Reviewer C", score: 6.9, note: "Evidence is promising; role ownership needs interview validation." }
+			],
+			practicalBuilding: [
+				{ reviewer: "Reviewer A", score: 8.4, note: "Clear build evidence and measurable pilot usage." },
+				{ reviewer: "Reviewer B", score: 8.7, note: "Prototype portfolio and workflow deployment are strong." },
+				{ reviewer: "Reviewer C", score: 8.1, note: "Would confirm code depth and production handoff." }
+			],
+			aiLeverage: [
+				{ reviewer: "Reviewer A", score: 7.4, note: "RAG and prompt evaluation evidence are relevant." },
+				{ reviewer: "Reviewer B", score: 7.1, note: "Good applied AI, not enough agentic autonomy detail." },
+				{ reviewer: "Reviewer C", score: 7.6, note: "Quality measurement and hallucination tracking stand out." }
+			],
+			enterpriseJudgment: [
+				{ reviewer: "Reviewer A", score: 8.5, note: "Security and retention assumptions are unusually explicit." },
+				{ reviewer: "Reviewer B", score: 8.0, note: "Good governance awareness; needs deeper control design probe." },
+				{ reviewer: "Reviewer C", score: 8.3, note: "Human approval and low-confidence routing are strong signals." }
+			],
+			stakeholderThinking: [
+				{ reviewer: "Reviewer A", score: 7.9, note: "Cross-functional discovery is clear." },
+				{ reviewer: "Reviewer B", score: 7.4, note: "Good stakeholder range, adoption evidence should be tested." },
+				{ reviewer: "Reviewer C", score: 7.8, note: "Training and senior demo support user-centered score." }
+			],
+			communicationGrowth: [
+				{ reviewer: "Reviewer A", score: 7.5, note: "Self-taught technical path plus demos show growth." },
+				{ reviewer: "Reviewer B", score: 7.0, note: "Documentation evidence exists; presentation quality unknown." },
+				{ reviewer: "Reviewer C", score: 7.6, note: "Good learning agility and non-technical onboarding." }
+			]
+		};
+
+		const fallbackResults = [
+			{ id: "problemFraming", label: "Problem Framing", short: "Ambiguity Handling", score: 7.6, reviewerScore: 7.6, confidence: "High", evidence: ["Scoped the MVP from an ambiguous request to improve knowledge search."], rationale: "모호한 문제를 MVP로 좁힌 근거가 있습니다.", concern: "가정 설정 방식은 인터뷰 확인이 필요합니다.", followUp: "처음 문제가 모호했을 때 어떤 가정을 세웠나요?", reviewerNote: "" },
+			{ id: "practicalBuilding", label: "Practical Building", short: "Execution", score: 8.8, reviewerScore: 8.8, confidence: "High", evidence: ["Built a working LLM document review workflow."], rationale: "실제 workflow build와 pilot impact가 있습니다.", concern: "production handoff 수준은 추가 확인이 필요합니다.", followUp: "직접 만든 artifact의 핵심 기능은 무엇인가요?", reviewerNote: "" },
+			{ id: "aiLeverage", label: "AI Leverage", short: "Technical Fluency", score: 7.1, reviewerScore: 7.1, confidence: "High", evidence: ["Implemented a lightweight RAG prototype using OpenAI APIs."], rationale: "RAG, prompt, evaluation 관련 근거가 있습니다.", concern: "agentic autonomy 경험은 제한적으로 보입니다.", followUp: "AI 출력 품질을 어떻게 평가했나요?", reviewerNote: "" },
+			{ id: "enterpriseJudgment", label: "Enterprise Judgment", short: "Governance", score: 9.2, reviewerScore: 9.2, confidence: "High", evidence: ["Partnered with security and data governance teams."], rationale: "보안, governance, human approval 근거가 강합니다.", concern: "공식 control design 경험은 확인이 필요합니다.", followUp: "보안 제약을 설계에 어떻게 반영했나요?", reviewerNote: "" },
+			{ id: "stakeholderThinking", label: "Stakeholder Thinking", short: "User-centered", score: 8.1, reviewerScore: 8.1, confidence: "High", evidence: ["Ran discovery sessions with managers, analysts, legal, and IT."], rationale: "다양한 stakeholder와 협업한 근거가 있습니다.", concern: "갈등 상황의 tradeoff는 인터뷰에서 확인해야 합니다.", followUp: "stakeholder 요구가 충돌했을 때 어떤 선택을 했나요?", reviewerNote: "" },
+			{ id: "communicationGrowth", label: "Communication & Growth", short: "Learning Agility", score: 7.3, reviewerScore: 7.3, confidence: "Medium", evidence: ["Presented demo outcomes and wrote onboarding notes."], rationale: "설명력과 학습 민첩성 근거가 있습니다.", concern: "발표 품질과 학습 깊이는 추가 확인이 필요합니다.", followUp: "새 기술을 빠르게 배워 적용한 사례는 무엇인가요?", reviewerNote: "" }
+		];
+
+		const stored = readStoredResult();
+		const state = {
+			fileName: stored.fileName || "synthetic_sample_resume.pdf",
+			resumeLength: stored.resumeLength || 1530,
+			createdAt: stored.createdAt || new Date().toISOString(),
+			results: normalizeResults(stored.results || fallbackResults)
+		};
+
+		const elements = {
+			fileName: document.getElementById("fileName"),
+			resumeLength: document.getElementById("resumeLength"),
+			createdAt: document.getElementById("createdAt"),
+			candidateAvg: document.getElementById("candidateAvg"),
+			benchmarkAvg: document.getElementById("benchmarkAvg"),
+			deltaAvg: document.getElementById("deltaAvg"),
+			recommendation: document.getElementById("recommendation"),
+			axisList: document.getElementById("axisList"),
+			summaryOutput: document.getElementById("summaryOutput"),
+			copyBtn: document.getElementById("copyBtn"),
+			backBtn: document.getElementById("backBtn")
+		};
+
+		function readStoredResult() {
+			try {
+				return JSON.parse(sessionStorage.getItem("aiBuilderEvaluationResult")) || {};
+			} catch {
+				return {};
+			}
+		}
+
+		function normalizeResults(results) {
+			return axisDefinitions.map((axis) => {
+				const found = results.find((item) => item.id === axis.id) || {};
+				const score = Number.isFinite(Number(found.reviewerScore ?? found.score)) ? Number(found.reviewerScore ?? found.score) : 5;
+				return {
+					...axis,
+					score,
+					reviewerScore: score,
+					confidence: found.confidence || "Medium",
+					evidence: Array.isArray(found.evidence) && found.evidence.length ? found.evidence : ["Resume에서 직접적인 근거가 부족합니다."],
+					rationale: found.rationale || "해당 축의 근거를 검토해야 합니다.",
+					concern: found.concern || "정보가 제한적이므로 인터뷰 확인이 필요합니다.",
+					followUp: found.followUp || "이 역량을 보여주는 가장 구체적인 사례를 설명해 주세요.",
+					reviewerNote: found.reviewerNote || ""
+				};
+			});
+		}
+
+		function render() {
+			elements.fileName.textContent = state.fileName;
+			elements.resumeLength.textContent = `${Number(state.resumeLength).toLocaleString()} chars`;
+			elements.createdAt.textContent = new Date(state.createdAt).toLocaleString();
+			elements.axisList.innerHTML = state.results.map(renderAxisCard).join("");
+
+			elements.axisList.querySelectorAll("[data-slider]").forEach((slider) => {
+				slider.addEventListener("input", (event) => {
+					const result = state.results.find((item) => item.id === event.target.dataset.slider);
+					result.reviewerScore = Number(event.target.value);
+					document.getElementById(`score-${result.id}`).textContent = formatScore(result.reviewerScore);
+					document.getElementById(`candidate-bar-${result.id}`).style.width = `${result.reviewerScore * 10}%`;
+					document.getElementById(`candidate-value-${result.id}`).textContent = formatScore(result.reviewerScore);
+					updateSummary();
+					drawRadarChart();
+				});
+			});
+
+			elements.axisList.querySelectorAll("[data-note]").forEach((note) => {
+				note.addEventListener("input", (event) => {
+					const result = state.results.find((item) => item.id === event.target.dataset.note);
+					result.reviewerNote = event.target.value;
+					updateSummary();
+				});
+			});
+
+			updateSummary();
+			drawRadarChart();
+		}
+
+		function renderAxisCard(result) {
+			const average = benchmark[result.id];
+			const peers = peerReviews[result.id] || [];
+			const peerAverage = peers.reduce((sum, peer) => sum + peer.score, 0) / Math.max(1, peers.length);
+			const delta = result.reviewerScore - average;
+			const deltaClass = delta >= 0 ? "positive" : "negative";
+
+			return `
+				<article class="panel axis-card">
+					<div class="axis-header">
+						<div class="axis-title">
+							<strong>${result.label}</strong>
+							<span>${result.short} · <span class="pill">${result.confidence} confidence</span> · <span class="${deltaClass}">${delta >= 0 ? "+" : ""}${delta.toFixed(1)} vs avg</span></span>
+						</div>
+						<div class="score-badge" id="score-${result.id}">${formatScore(result.reviewerScore)}</div>
+						<input type="range" min="0" max="10" step="0.1" value="${result.reviewerScore}" data-slider="${result.id}" aria-label="${result.label} calibrated score" />
+					</div>
+
+					<div class="compare-bars">
+						${renderBar("Candidate", result.reviewerScore, "", `candidate-bar-${result.id}`, `candidate-value-${result.id}`)}
+						${renderBar("Dummy average", average, "average")}
+						${renderBar("Peer average", peerAverage, "peer")}
+					</div>
+
+					<div class="detail-grid">
+						<div class="detail-box"><strong>RAG evidence</strong><ul>${result.evidence.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></div>
+						<div class="detail-box"><strong>Rationale</strong><p>${escapeHtml(result.rationale)}</p></div>
+						<div class="detail-box"><strong>Concern</strong><p>${escapeHtml(result.concern)}</p></div>
+						<div class="detail-box"><strong>Follow-up</strong><p>${escapeHtml(result.followUp)}</p></div>
+					</div>
+
+					<div class="peer-panel">
+						<div class="peer-head"><span>익명 타 평가자 calibration sample</span><span>dummy data</span></div>
+						<div class="peer-grid">
+							${peers.map((peer) => `
+								<div class="peer-card">
+									<strong><span>${peer.reviewer}</span><span>${formatScore(peer.score)}</span></strong>
+									<p>${escapeHtml(peer.note)}</p>
+								</div>
+							`).join("")}
+						</div>
+					</div>
+
+					<div class="calibration-note">
+						<textarea data-note="${result.id}" placeholder="평가자가 평균/타 평가자 결과를 보고 조정한 이유를 기록하세요.">${escapeHtml(result.reviewerNote)}</textarea>
+						<select aria-label="${result.label} calibration decision">
+							<option>Keep calibrated score</option>
+							<option>Raise after peer comparison</option>
+							<option>Lower after peer comparison</option>
+							<option>Needs panel discussion</option>
+						</select>
+					</div>
+				</article>
+			`;
+		}
+
+		function renderBar(label, score, className = "", barId = "", valueId = "") {
+			return `
+				<div class="bar-row">
+					<span>${label}</span>
+					<div class="bar-track"><div ${barId ? `id="${barId}"` : ""} class="bar-fill ${className}" style="width: ${score * 10}%"></div></div>
+					<strong ${valueId ? `id="${valueId}"` : ""}>${formatScore(score)}</strong>
+				</div>
+			`;
+		}
+
+		function updateSummary() {
+			const candidateScores = state.results.map((item) => item.reviewerScore);
+			const benchmarkScores = state.results.map((item) => benchmark[item.id]);
+			const candidateAverage = average(candidateScores);
+			const benchmarkAverage = average(benchmarkScores);
+			const delta = candidateAverage - benchmarkAverage;
+			const recommendation = candidateAverage >= 8 ? "Strong Yes" : candidateAverage >= 6.7 ? "Yes" : candidateAverage >= 5.2 ? "Maybe" : "No";
+			const strengths = [...state.results].sort((a, b) => b.reviewerScore - a.reviewerScore).slice(0, 2);
+			const concerns = [...state.results].sort((a, b) => a.reviewerScore - b.reviewerScore).slice(0, 2);
+			const notes = state.results.filter((item) => item.reviewerNote.trim()).map((item) => `- ${item.label}: ${item.reviewerNote.trim()}`);
+
+			elements.candidateAvg.textContent = candidateAverage.toFixed(1);
+			elements.benchmarkAvg.textContent = benchmarkAverage.toFixed(1);
+			elements.deltaAvg.textContent = `${delta >= 0 ? "+" : ""}${delta.toFixed(1)}`;
+			elements.deltaAvg.className = delta >= 0 ? "positive" : "negative";
+			elements.recommendation.textContent = recommendation;
+			elements.summaryOutput.textContent = `Recommendation: ${recommendation}\nCandidate average: ${candidateAverage.toFixed(1)} / 10\nDummy benchmark average: ${benchmarkAverage.toFixed(1)} / 10\nDelta: ${delta >= 0 ? "+" : ""}${delta.toFixed(1)}\n\nTop strengths versus benchmark:\n${strengths.map((item) => `- ${item.label}: ${formatScore(item.reviewerScore)} vs ${formatScore(benchmark[item.id])}. ${item.rationale}`).join("\n")}\n\nMain calibration areas:\n${concerns.map((item) => `- ${item.label}: ${item.concern}`).join("\n")}\n\nSuggested interview follow-up:\n${concerns.map((item) => `- ${item.followUp}`).join("\n")}\n\nReviewer calibration notes:\n${notes.length ? notes.join("\n") : "- No reviewer notes recorded yet."}\n\nGovernance note: Dummy average and anonymous reviewer samples are for calibration only. Final hiring decisions should remain human-owned and supported by documented evidence.`;
+		}
+
+		function drawRadarChart() {
+			const canvas = document.getElementById("radarChart");
+			const candidate = state.results.map((item) => item.reviewerScore);
+			const averageValues = state.results.map((item) => benchmark[item.id]);
+			const peerValues = state.results.map((item) => average((peerReviews[item.id] || []).map((peer) => peer.score)));
+			drawRadar(canvas, [
+				{ values: averageValues, fill: "rgba(179, 92, 0, 0.12)", stroke: "#b35c00" },
+				{ values: peerValues, fill: "rgba(23, 50, 77, 0.10)", stroke: "#17324d" },
+				{ values: candidate, fill: "rgba(0, 124, 137, 0.22)", stroke: "#007c89" }
+			], state.results.map((item) => item.label));
+		}
+
+		function drawRadar(canvas, series, labels) {
+			const context = canvas.getContext("2d");
+			const width = canvas.width;
+			const height = canvas.height;
+			const centerX = width / 2;
+			const centerY = height / 2;
+			const radius = Math.min(width, height) * 0.31;
+			context.clearRect(0, 0, width, height);
+			context.font = "12px Inter, sans-serif";
+
+			for (let ring = 1; ring <= 5; ring += 1) {
+				drawPolygon(context, Array(6).fill((ring / 5) * 10), radius, centerX, centerY, "transparent", ring === 5 ? "#9fb2c8" : "#d9e1ea", 1);
+			}
+
+			for (let index = 0; index < 6; index += 1) {
+				const angle = -Math.PI / 2 + (Math.PI * 2 * index) / 6;
+				context.beginPath();
+				context.moveTo(centerX, centerY);
+				context.lineTo(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius);
+				context.strokeStyle = "#d9e1ea";
+				context.stroke();
+			}
+
+			series.forEach((item) => drawPolygon(context, item.values, radius, centerX, centerY, item.fill, item.stroke, 3));
+
+			labels.forEach((label, index) => {
+				const angle = -Math.PI / 2 + (Math.PI * 2 * index) / 6;
+				const x = centerX + Math.cos(angle) * (radius + 58);
+				const y = centerY + Math.sin(angle) * (radius + 42);
+				context.fillStyle = "#17324d";
+				context.textAlign = x < centerX - 10 ? "right" : x > centerX + 10 ? "left" : "center";
+				context.fillText(label.replace(" & ", " + "), x, y);
+			});
+		}
+
+		function drawPolygon(context, values, radius, centerX, centerY, fill, stroke, lineWidth) {
+			context.beginPath();
+			values.forEach((value, index) => {
+				const angle = -Math.PI / 2 + (Math.PI * 2 * index) / 6;
+				const pointRadius = radius * (Math.max(0, Math.min(10, value)) / 10);
+				const x = centerX + Math.cos(angle) * pointRadius;
+				const y = centerY + Math.sin(angle) * pointRadius;
+				if (index === 0) context.moveTo(x, y);
+				else context.lineTo(x, y);
+			});
+			context.closePath();
+			context.fillStyle = fill;
+			context.strokeStyle = stroke;
+			context.lineWidth = lineWidth;
+			context.fill();
+			context.stroke();
+		}
+
+		function average(values) {
+			return values.reduce((sum, value) => sum + value, 0) / Math.max(1, values.length);
+		}
+
+		function formatScore(score) {
+			return Number(score).toFixed(1);
+		}
+
+		function escapeHtml(value) {
+			return String(value).replace(/[&<>"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[character]));
+		}
+
+		elements.backBtn.addEventListener("click", () => {
+			window.location.href = "index.html";
+		});
+
+		elements.copyBtn.addEventListener("click", async () => {
+			await navigator.clipboard.writeText(elements.summaryOutput.textContent);
+		});
+
+		lucide.createIcons();
+		render();
+	</script>
+</body>
+</html>
