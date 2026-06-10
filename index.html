@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -637,49 +637,49 @@
 				<span>AI Builder Evaluation Workbench</span>
 			</div>
 			<div class="topbar-actions">
-				<button class="icon-btn" id="resetBtn" title="초기화"><i data-lucide="rotate-ccw"></i></button>
+				<button class="icon-btn" id="resetBtn" title="Reset"><i data-lucide="rotate-ccw"></i></button>
 			</div>
 		</header>
 
 		<main>
 			<section class="hero" aria-labelledby="pageTitle">
 				<div class="hero-copy">
-					<h1 id="pageTitle">AI Builder 평가 페이지</h1>
-					<p>Resume PDF를 업로드하면 KPMG AI Builder 역할 기준에 맞춰 6개 역량 축의 근거를 추출하고, 정량 점수와 평가자 calibration 화면을 제공합니다.</p>
-					<div class="hero-points" aria-label="주요 기능">
-						<div class="point"><strong>Resume-grounded RAG</strong><span>레쥬메 문장을 축별로 검색해 근거를 먼저 분리합니다.</span></div>
-						<div class="point"><strong>6-axis scoring</strong><span>0~10점으로 점수화하고 6각형 차트로 비교합니다.</span></div>
-						<div class="point"><strong>Human calibration</strong><span>애매한 부분은 평가자가 점수와 코멘트를 조정합니다.</span></div>
+					<h1 id="pageTitle">AI Builder Evaluation Workbench</h1>
+					<p>Upload a resume PDF to extract evidence across six AI Builder capability axes, generate quantitative scores, and support reviewer calibration.</p>
+					<div class="hero-points" aria-label="Key features">
+						<div class="point"><strong>Resume-grounded RAG</strong><span>Retrieves relevant resume evidence for each evaluation axis before scoring.</span></div>
+						<div class="point"><strong>6-axis scoring</strong><span>Scores each axis from 0 to 10 and visualizes the result as a radar chart.</span></div>
+						<div class="point"><strong>Human calibration</strong><span>Lets reviewers adjust uncertain scores and document their reasoning.</span></div>
 					</div>
 				</div>
 			</section>
 
 			<section class="info-section" aria-label="Evaluation axes">
 				<div class="section-heading">
-					<h2>6개 평가 축</h2>
-					<p>학교나 회사 브랜드보다 Resume 안의 실제 근거를 기준으로, 각 축을 0~10점으로 평가합니다.</p>
+					<h2>Six Evaluation Axes</h2>
+					<p>Each axis is scored from 0 to 10 using resume-based evidence, not school names or employer brand signals.</p>
 				</div>
 				<div class="axis-grid">
-					<div class="axis-info"><strong>Problem Framing</strong><p>모호한 문제를 정의하고 MVP 범위, 성공 기준, tradeoff를 세운 근거를 봅니다.</p></div>
-					<div class="axis-info"><strong>Practical Building</strong><p>프로토타입, 자동화, API, dashboard 등 실제 작동 산출물을 만든 경험을 봅니다.</p></div>
-					<div class="axis-info"><strong>AI Leverage</strong><p>LLM, RAG, agent, prompt evaluation을 문제 해결 workflow에 적용한 방식을 봅니다.</p></div>
-					<div class="axis-info"><strong>Enterprise Judgment</strong><p>보안, privacy, governance, human approval, 운영 리스크를 고려했는지 봅니다.</p></div>
-					<div class="axis-info"><strong>Stakeholder Thinking</strong><p>비즈니스, IT, legal, 사용자 등 여러 이해관계자 요구를 조율한 근거를 봅니다.</p></div>
-					<div class="axis-info"><strong>Communication & Growth</strong><p>복잡한 내용을 설명하고 빠르게 배우며 문서화, 데모, onboarding까지 연결한 경험을 봅니다.</p></div>
+					<div class="axis-info"><strong>Problem Framing</strong><p>Looks for evidence of defining ambiguous problems, MVP scope, success criteria, and trade-offs.</p></div>
+					<div class="axis-info"><strong>Practical Building</strong><p>Looks for working artifacts such as prototypes, automations, APIs, dashboards, and workflows.</p></div>
+					<div class="axis-info"><strong>AI Leverage</strong><p>Looks at how LLMs, RAG, agents, and prompt evaluation were applied to real workflows.</p></div>
+					<div class="axis-info"><strong>Enterprise Judgment</strong><p>Checks whether security, privacy, governance, human approval, and operational risk were considered.</p></div>
+					<div class="axis-info"><strong>Stakeholder Thinking</strong><p>Looks for evidence of balancing business, IT, legal, risk, and user needs.</p></div>
+					<div class="axis-info"><strong>Communication & Growth</strong><p>Looks for clear communication, learning agility, documentation, demos, and onboarding evidence.</p></div>
 				</div>
 			</section>
 
 			<section class="info-section" aria-label="Evaluation pipeline">
 				<div class="section-heading">
-					<h2>평가 파이프라인</h2>
-					<p>AI는 Resume 근거 추출과 정리만 돕고, 최종 판단과 calibration은 사람이 수행합니다.</p>
+					<h2>Evaluation Pipeline</h2>
+					<p>AI supports evidence extraction and organization, while final judgment and calibration remain human-owned.</p>
 				</div>
 				<div class="pipeline-grid">
-					<div class="pipeline-step"><div class="step-number">1</div><strong>PDF Intake</strong><p>Resume PDF에서 텍스트를 추출하고 분석 가능한 문장 단위로 나눕니다.</p></div>
-					<div class="pipeline-step"><div class="step-number">2</div><strong>Evidence Retrieval</strong><p>6개 axis별로 관련 문장을 검색해 RAG evidence 후보를 만듭니다.</p></div>
-					<div class="pipeline-step"><div class="step-number">3</div><strong>Scoring</strong><p>근거의 구체성, ownership, impact, enterprise relevance를 기준으로 점수화합니다.</p></div>
-					<div class="pipeline-step"><div class="step-number">4</div><strong>Comparison Set</strong><p>같은 axis의 다른 지원자 평가 사례와 비교해 평가 일관성을 확인합니다.</p></div>
-					<div class="pipeline-step"><div class="step-number">5</div><strong>Human Calibration</strong><p>평가자가 점수와 메모를 조정하고 후속 인터뷰 질문을 정합니다.</p></div>
+					<div class="pipeline-step"><div class="step-number">1</div><strong>PDF Intake</strong><p>Extracts text from the resume PDF and splits it into analyzable chunks.</p></div>
+					<div class="pipeline-step"><div class="step-number">2</div><strong>Evidence Retrieval</strong><p>Finds relevant resume evidence for each of the six evaluation axes.</p></div>
+					<div class="pipeline-step"><div class="step-number">3</div><strong>Scoring</strong><p>Scores evidence based on specificity, ownership, impact, and enterprise relevance.</p></div>
+					<div class="pipeline-step"><div class="step-number">4</div><strong>Comparison Set</strong><p>Compares the candidate with other synthetic examples on the same axis.</p></div>
+					<div class="pipeline-step"><div class="step-number">5</div><strong>Human Calibration</strong><p>Allows reviewers to adjust scores, add notes, and define follow-up questions.</p></div>
 				</div>
 			</section>
 
@@ -689,27 +689,27 @@
 						<input id="pdfInput" type="file" accept="application/pdf" />
 						<div>
 							<div class="drop-icon"><i data-lucide="upload-cloud"></i></div>
-							<h2>Resume PDF 업로드</h2>
-							<p>PDF 파일을 선택하거나 이 영역에 드롭하세요. 분석은 브라우저에서 텍스트를 추출한 뒤 시작됩니다.</p>
-							<span class="secondary-btn"><i data-lucide="folder-open"></i>PDF 선택</span>
-							<div class="status-line" id="fileStatus">아직 파일이 선택되지 않았습니다.</div>
+							<h2>Upload Resume PDF</h2>
+							<p>Select a PDF file or drop it here. Analysis starts after the browser extracts the resume text.</p>
+							<span class="secondary-btn"><i data-lucide="folder-open"></i>Select PDF</span>
+							<div class="status-line" id="fileStatus">No file selected yet.</div>
 						</div>
 					</label>
 
 					<div class="control-panel">
 						<div class="field">
-							<label for="apiKey">OpenAI API Key <span class="hint">브라우저 세션에서만 사용</span></label>
+							<label for="apiKey">OpenAI API Key <span class="hint">Used only in this browser session</span></label>
 							<input id="apiKey" type="password" autocomplete="off" placeholder="sk-..." />
 						</div>
 						<div class="privacy-note">
 							<i data-lucide="shield-alert"></i>
-							<span>데모 목적의 프론트엔드 프로토타입입니다. 실제 운영에서는 API 키와 Resume 원문을 브라우저에서 직접 OpenAI로 보내지 말고 Netlify Function 같은 서버 프록시와 보안 검토를 사용하세요.</span>
+							<span>This is a frontend prototype for demonstration. In production, API keys and resume text should be handled through a secure server-side proxy such as a Netlify Function.</span>
 						</div>
 						<div class="action-row">
-							<button class="primary-btn" id="analyzeBtn"><i data-lucide="sparkles"></i>분석 시작</button>
-							<button class="secondary-btn" id="demoAnalyzeBtn"><i data-lucide="wand-sparkles"></i>샘플 분석</button>
+							<button class="primary-btn" id="analyzeBtn"><i data-lucide="sparkles"></i>Start Analysis</button>
+							<button class="secondary-btn" id="demoAnalyzeBtn"><i data-lucide="wand-sparkles"></i>Run Sample</button>
 						</div>
-						<div class="status-line" id="analysisStatus">PDF를 올리거나 샘플 분석을 실행하세요.</div>
+						<div class="status-line" id="analysisStatus">Upload a PDF or run the sample analysis.</div>
 					</div>
 				</div>
 			</section>
@@ -718,9 +718,9 @@
 				<div class="section-title">
 					<div>
 						<h2>Evaluation Dashboard</h2>
-						<p>AI 제안 점수는 시작점입니다. 평가자는 근거와 불확실성을 보고 조정할 수 있습니다.</p>
+						<p>AI-suggested scores are a starting point. Reviewers can inspect evidence and adjust uncertain scores.</p>
 					</div>
-					<button class="secondary-btn" id="copySummaryBtn"><i data-lucide="copy"></i>요약 복사</button>
+					<button class="secondary-btn" id="copySummaryBtn"><i data-lucide="copy"></i>Copy Summary</button>
 				</div>
 
 				<div class="dashboard-grid">
@@ -737,17 +737,17 @@
 
 				<div class="panel summary-panel">
 					<div>
-						<h3>최종 평가 요약</h3>
-						<div class="summary-output" id="finalSummary">분석 결과가 여기에 표시됩니다.</div>
+						<h3>Final Evaluation Summary</h3>
+						<div class="summary-output" id="finalSummary">Analysis results will appear here.</div>
 					</div>
 					<div>
 						<h3>Responsible AI Check</h3>
 						<div class="checklist">
-							<label class="check-item"><input type="checkbox" checked /> AI 점수만으로 합격/불합격을 결정하지 않음</label>
-							<label class="check-item"><input type="checkbox" checked /> 학교/회사 브랜드보다 수행 내용과 근거를 우선함</label>
-							<label class="check-item"><input type="checkbox" checked /> 정보 부족 항목은 follow-up 질문으로 연결함</label>
-							<label class="check-item"><input type="checkbox" /> 복수 평가자 calibration 완료</label>
-							<label class="check-item"><input type="checkbox" /> 개인정보 처리 및 보관 정책 확인</label>
+							<label class="check-item"><input type="checkbox" checked /> Do not make pass or fail decisions from AI scores alone</label>
+							<label class="check-item"><input type="checkbox" checked /> Prioritize work evidence over school or employer brand</label>
+							<label class="check-item"><input type="checkbox" checked /> Convert missing information into follow-up questions</label>
+							<label class="check-item"><input type="checkbox" /> Multi-reviewer calibration completed</label>
+							<label class="check-item"><input type="checkbox" /> Privacy handling and retention policy reviewed</label>
 						</div>
 					</div>
 				</div>
@@ -758,8 +758,8 @@
 	<div class="loading" id="loading">
 		<div class="loader-box">
 			<div class="spinner"></div>
-			<strong id="loadingTitle">Resume 분석 중</strong>
-			<p class="hint" id="loadingText">PDF 텍스트 추출, 축별 근거 검색, 정량 점수 산출을 진행하고 있습니다.</p>
+			<strong id="loadingTitle">Analyzing Resume</strong>
+			<p class="hint" id="loadingText">Extracting PDF text, retrieving axis evidence, and generating quantitative scores.</p>
 		</div>
 	</div>
 
@@ -773,42 +773,42 @@
 				id: "problemFraming",
 				label: "Problem Framing",
 				short: "Ambiguity Handling",
-				description: "모호한 enterprise 문제를 구조화하고 해결 가능한 범위로 좁히는 능력",
+				description: "Ability to structure ambiguous enterprise problems and narrow them into practical scopes",
 				keywords: ["ambiguous", "discovery", "scoped", "roadmap", "strategy", "pain point", "requirements", "problem", "hypothesis", "workshop", "framing", "prioritized"]
 			},
 			{
 				id: "practicalBuilding",
 				label: "Practical Building",
 				short: "Execution",
-				description: "아이디어를 실제 작동하는 prototype, workflow, automation, system으로 만드는 능력",
+				description: "Ability to turn ideas into working prototypes, workflows, automations, or systems",
 				keywords: ["built", "launched", "deployed", "prototype", "automation", "dashboard", "api", "workflow", "tool", "mvp", "production", "integration", "shipped"]
 			},
 			{
 				id: "aiLeverage",
 				label: "AI Leverage",
 				short: "Technical Fluency",
-				description: "LLM, agent, RAG, prompt, evaluation 등을 실용적으로 적용하는 능력",
+				description: "Ability to apply LLMs, agents, RAG, prompts, and evaluation methods practically",
 				keywords: ["ai", "llm", "rag", "agent", "openai", "prompt", "model", "machine learning", "embedding", "evaluation", "automation", "copilot", "chatgpt"]
 			},
 			{
 				id: "enterpriseJudgment",
 				label: "Enterprise Judgment",
 				short: "Governance",
-				description: "보안, 개인정보, 리스크, 확장성, 운영 현실을 고려하는 판단력",
+				description: "Ability to consider security, privacy, risk, scalability, and operational realities",
 				keywords: ["security", "privacy", "governance", "compliance", "risk", "regulated", "audit", "monitoring", "scale", "production", "enterprise", "controls"]
 			},
 			{
 				id: "stakeholderThinking",
 				label: "Stakeholder Thinking",
 				short: "User-centered",
-				description: "사용자, 비즈니스, 기술, 리스크 이해관계자의 요구를 균형 있게 다루는 능력",
+				description: "Ability to balance user, business, technical, and risk stakeholder needs",
 				keywords: ["stakeholder", "client", "user", "cross-functional", "workshop", "interview", "training", "adoption", "collaborated", "business", "operations", "design"]
 			},
 			{
 				id: "communicationGrowth",
 				label: "Communication & Growth",
 				short: "Learning Agility",
-				description: "복잡한 내용을 설명하고 빠르게 배우며 성장한 증거",
+				description: "Ability to explain complex work clearly, learn quickly, and show evidence of growth",
 				keywords: ["presented", "documented", "trained", "wrote", "communicated", "self-taught", "learned", "mentored", "leadership", "published", "demo", "case study"]
 			}
 		];
@@ -863,7 +863,7 @@ Projects
 			elements.analysisStatus.textContent = message;
 		}
 
-		function setLoading(isLoading, message = "PDF 텍스트 추출, 축별 근거 검색, 정량 점수 산출을 진행하고 있습니다.") {
+		function setLoading(isLoading, message = "Extracting PDF text, retrieving axis evidence, and generating quantitative scores.") {
 			elements.loading.classList.toggle("visible", isLoading);
 			elements.loadingText.textContent = message;
 		}
@@ -920,9 +920,9 @@ Projects
 					short: axis.short,
 					score,
 					confidence,
-					evidence: evidence.length ? evidence : ["Resume에서 직접적인 근거가 부족합니다."],
-					rationale: evidence.length ? `${axis.description}에 연결되는 resume 문장이 확인되었습니다. 구체적인 ownership과 impact 여부를 기준으로 예비 점수를 산출했습니다.` : `해당 축은 resume 정보만으로 판단하기 어렵습니다. 낮은 확신도로 표시하고 인터뷰에서 확인해야 합니다.`,
-					concern: evidence.length >= 2 ? "근거는 있으나 실제 역할 범위와 운영 수준은 추가 확인이 필요합니다." : "근거가 제한적이므로 점수보다 follow-up 질문이 중요합니다.",
+					evidence: evidence.length ? evidence : ["The resume does not provide direct evidence for this axis."],
+					rationale: evidence.length ? `Resume statements connected to ${axis.description} were found. The preliminary score is based on ownership, specificity, and impact signals.` : `This axis is difficult to judge from the resume alone. It should be marked with lower confidence and verified in interview.`,
+					concern: evidence.length >= 2 ? "Evidence exists, but the candidate's exact role and operational depth need follow-up." : "Evidence is limited, so the follow-up question is more important than the score.",
 					followUp: makeFollowUp(axis.id),
 					reviewerScore: score,
 					reviewerNote: ""
@@ -932,12 +932,12 @@ Projects
 
 		function makeFollowUp(axisId) {
 			const questions = {
-				problemFraming: "처음 문제가 모호했을 때 어떤 가정을 세웠고, 무엇을 의도적으로 범위에서 제외했나요?",
-				practicalBuilding: "직접 만든 artifact의 핵심 기능과 사용자가 실제로 사용한 증거를 설명해 주세요.",
-				aiLeverage: "AI 출력 품질과 hallucination 위험을 어떤 방식으로 평가했나요?",
-				enterpriseJudgment: "보안, 개인정보, governance 제약을 설계에 어떻게 반영했나요?",
-				stakeholderThinking: "서로 다른 stakeholder 요구가 충돌했을 때 어떤 tradeoff를 선택했나요?",
-				communicationGrowth: "새로운 도메인이나 기술을 빠르게 배워 적용한 가장 구체적인 사례는 무엇인가요?"
+				problemFraming: "When the problem was ambiguous, what assumptions did you make and what did you intentionally exclude from scope?",
+				practicalBuilding: "What were the core features of the artifact you built, and what evidence shows that users actually used it?",
+				aiLeverage: "How did you evaluate AI output quality and hallucination risk?",
+				enterpriseJudgment: "How did you reflect security, privacy, and governance constraints in the design?",
+				stakeholderThinking: "When stakeholder needs conflicted, what trade-off did you choose?",
+				communicationGrowth: "What is the most specific example of learning a new domain or technology quickly and applying it?"
 			};
 			return questions[axisId];
 		}
@@ -1004,7 +1004,7 @@ Return strict JSON only. Shape:
 					confidence: match.confidence || "Medium",
 					evidence: Array.isArray(match.evidence) && match.evidence.length ? match.evidence : retrieveEvidence(text, axis),
 					rationale: match.rationale || axis.description,
-					concern: match.concern || "추가 human review가 필요합니다.",
+					concern: match.concern || "Additional human review is needed.",
 					followUp: match.followUp || makeFollowUp(axis.id),
 					reviewerScore: score,
 					reviewerNote: ""
@@ -1057,7 +1057,7 @@ Return strict JSON only. Shape:
 					<div class="reviewer-notes">
 						<div class="field">
 							<label for="note-${result.id}">Calibration note</label>
-							<textarea id="note-${result.id}" data-note="${result.id}" placeholder="평가자가 점수를 조정한 이유나 인터뷰에서 확인할 내용을 적으세요."></textarea>
+							<textarea id="note-${result.id}" data-note="${result.id}" placeholder="Record why the reviewer adjusted the score or what should be checked in the interview."></textarea>
 						</div>
 						<div class="field">
 							<label for="decision-${result.id}">Reviewer signal</label>
@@ -1193,7 +1193,7 @@ Return strict JSON only. Shape:
 		async function analyzeCurrentResume(forceLocal = false) {
 			const text = state.resumeText.trim();
 			if (!text) {
-				setStatus("먼저 PDF를 올리거나 샘플을 로드하세요.");
+				setStatus("Upload a PDF or load the sample first.");
 				return;
 			}
 
@@ -1201,21 +1201,21 @@ Return strict JSON only. Shape:
 			try {
 				let results = null;
 				if (!forceLocal && elements.apiKey.value.trim()) {
-					setLoading(true, "OpenAI API로 resume-grounded 평가를 생성하는 중입니다.");
+					setLoading(true, "Generating resume-grounded evaluation with the OpenAI API.");
 					results = await openAiAnalyze(text);
-					setStatus("OpenAI 분석을 완료했습니다. 점수는 평가자가 조정할 수 있습니다.");
+					setStatus("OpenAI analysis is complete. Reviewers can adjust the scores.");
 				}
 				if (!results) {
-					setLoading(true, "브라우저 내 RAG 휴리스틱으로 샘플 분석을 생성하는 중입니다.");
+					setLoading(true, "Generating a local demo analysis with browser-side RAG heuristics.");
 					results = localAnalyze(text);
-					setStatus("로컬 데모 분석을 완료했습니다. API 키 없이도 워크플로우를 시연할 수 있습니다.");
+					setStatus("Local demo analysis is complete. The workflow can be shown without an API key.");
 				}
 				renderResults(results);
 			} catch (error) {
 				console.error(error);
 				const fallback = localAnalyze(text);
 				renderResults(fallback);
-				setStatus("API 호출에 실패해 로컬 데모 분석으로 전환했습니다. 브라우저 콘솔에서 오류를 확인할 수 있습니다.");
+				setStatus("The API call failed, so the app switched to local demo analysis. See the browser console for details.");
 			} finally {
 				setLoading(false);
 			}
@@ -1224,16 +1224,16 @@ Return strict JSON only. Shape:
 		elements.pdfInput.addEventListener("change", async (event) => {
 			const file = event.target.files?.[0];
 			if (!file) return;
-			setLoading(true, "PDF 텍스트를 추출하는 중입니다.");
+			setLoading(true, "Extracting text from the PDF.");
 			try {
 				state.fileName = file.name;
 				state.resumeText = await extractPdfText(file);
 				elements.fileStatus.textContent = `${file.name} · ${state.resumeText.length.toLocaleString()} characters extracted`;
-				setStatus("PDF 텍스트 추출 완료. 분석을 시작할 수 있습니다.");
+				setStatus("PDF text extraction is complete. You can start analysis.");
 			} catch (error) {
 				console.error(error);
-				elements.fileStatus.textContent = "PDF 텍스트 추출에 실패했습니다.";
-				setStatus("PDF를 읽지 못했습니다. 텍스트 기반 PDF인지 확인해 주세요.");
+				elements.fileStatus.textContent = "PDF text extraction failed.";
+				setStatus("The PDF could not be read. Please check that it is a text-based PDF.");
 			} finally {
 				setLoading(false);
 			}
@@ -1273,7 +1273,7 @@ Return strict JSON only. Shape:
 		elements.resetBtn.addEventListener("click", () => window.location.reload());
 		elements.copySummaryBtn.addEventListener("click", async () => {
 			await navigator.clipboard.writeText(elements.finalSummary.textContent);
-			setStatus("최종 평가 요약을 클립보드에 복사했습니다.");
+			setStatus("Final evaluation summary copied to clipboard.");
 		});
 
 		lucide.createIcons();

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -607,16 +607,16 @@
 			<span>AI Builder Evaluation Analysis</span>
 		</div>
 		<div class="top-actions">
-			<button class="secondary-btn" id="backBtn"><i data-lucide="arrow-left"></i>업로드로 돌아가기</button>
-			<button class="primary-btn" id="copyBtn"><i data-lucide="copy"></i>요약 복사</button>
+			<button class="secondary-btn" id="backBtn"><i data-lucide="arrow-left"></i>Back to Upload</button>
+			<button class="primary-btn" id="copyBtn"><i data-lucide="copy"></i>Copy Summary</button>
 		</div>
 	</header>
 
 	<main>
 		<section class="page-head">
 			<div class="headline">
-				<h1>분석 결과</h1>
-				<p>업로드 화면은 숨기고, Resume 기반 6개 평가 축의 결과만 보여줍니다. 후보자 점수는 같은 axis에서 다른 지원자가 어떻게 평가받았는지와 함께 비교됩니다.</p>
+				<h1>Analysis Results</h1>
+				<p>The upload screen is hidden here. This page shows resume-based results across six evaluation axes and compares the candidate with other synthetic candidates on the same axis.</p>
 			</div>
 			<aside class="meta-panel">
 				<div class="meta-row"><span>Resume</span><strong id="fileName">-</strong></div>
@@ -626,9 +626,9 @@
 		</section>
 
 		<section class="kpi-grid" aria-label="Summary metrics">
-			<div class="kpi"><span>Candidate Avg</span><strong id="candidateAvg">0.0</strong><small>평가자 calibration 반영 점수</small></div>
-			<div class="kpi"><span>Other Candidates</span><strong id="cohortAvg">0.0</strong><small>같은 axis 비교군 평균</small></div>
-			<div class="kpi"><span>Recommendation</span><strong id="recommendation">-</strong><small>자동 결정이 아닌 review aid</small></div>
+			<div class="kpi"><span>Candidate Avg</span><strong id="candidateAvg">0.0</strong><small>Score after reviewer calibration</small></div>
+			<div class="kpi"><span>Other Candidates</span><strong id="cohortAvg">0.0</strong><small>Same-axis comparison average</small></div>
+			<div class="kpi"><span>Recommendation</span><strong id="recommendation">-</strong><small>Review aid, not an automated decision</small></div>
 		</section>
 
 		<section class="main-grid">
@@ -644,38 +644,38 @@
 
 		<section class="panel summary-panel">
 			<div>
-				<h2>최종 평가 요약</h2>
+				<h2>Final Evaluation Summary</h2>
 				<div class="summary-output" id="summaryOutput"></div>
 			</div>
 			<div>
 				<h3>Calibration Guardrails</h3>
 				<div class="checklist">
-					<label class="check-item"><input type="checkbox" checked /> AI 점수만으로 합격/불합격을 결정하지 않음</label>
-					<label class="check-item"><input type="checkbox" checked /> 다른 지원자 사례는 평가 일관성 확인용 비교군으로만 사용</label>
-					<label class="check-item"><input type="checkbox" checked /> 정보 부족 항목은 후속 질문으로 연결</label>
-					<label class="check-item"><input type="checkbox" /> 실제 운영 전 privacy/security review 필요</label>
+					<label class="check-item"><input type="checkbox" checked /> Do not make pass or fail decisions from AI scores alone</label>
+					<label class="check-item"><input type="checkbox" checked /> Use other-candidate examples only for calibration consistency</label>
+					<label class="check-item"><input type="checkbox" checked /> Convert missing information into follow-up questions</label>
+					<label class="check-item"><input type="checkbox" /> Privacy and security review required before production use</label>
 				</div>
 			</div>
 		</section>
-		<button class="chat-launcher" id="chatLauncher" title="평가 검토 도우미"><i data-lucide="message-circle"></i></button>
+		<button class="chat-launcher" id="chatLauncher" title="Evaluation Review Assistant"><i data-lucide="message-circle"></i></button>
 		<div class="chat-backdrop" id="chatBackdrop"></div>
 		<aside class="panel chat-panel" id="chatPanel" aria-label="Evaluation chatbot">
 				<div class="chat-head">
 					<div>
-						<h2>평가 검토 도우미</h2>
-						<p>후보자의 강점, 리스크, 보정 포인트를 빠르게 확인합니다.</p>
+						<h2>Evaluation Review Assistant</h2>
+						<p>Quickly review candidate strengths, risks, and calibration points.</p>
 					</div>
-					<button class="close-chat" id="closeChat" title="닫기"><i data-lucide="x"></i></button>
+					<button class="close-chat" id="closeChat" title="Close"><i data-lucide="x"></i></button>
 				</div>
 				<div class="quick-prompts">
-					<button type="button" data-prompt="이 후보자의 가장 강한 점과 가장 위험한 점을 요약해줘.">강점/리스크 요약</button>
-					<button type="button" data-prompt="다른 지원자와 비교했을 때 어떤 축을 인터뷰에서 확인해야 해?">비교 축</button>
-					<button type="button" data-prompt="다른 지원자 사례를 고려하면 calibration을 어디서 해야 해?">Calibration</button>
+					<button type="button" data-prompt="Summarize this candidate's strongest points and biggest risks.">Strengths / Risks</button>
+					<button type="button" data-prompt="Compared with other candidates, which axes should I check in the interview?">Compare Axes</button>
+					<button type="button" data-prompt="Considering other candidate examples, where should calibration happen?">Calibration</button>
 				</div>
 				<div class="chat-messages" id="chatMessages"></div>
 				<form class="chat-form" id="chatForm">
-					<textarea id="chatInput" placeholder="예: 이 후보자를 다음 라운드로 보내도 될까? 어떤 질문을 해야 해?"></textarea>
-					<button class="primary-btn" type="submit"><i data-lucide="send"></i>질문하기</button>
+					<textarea id="chatInput" placeholder="Example: Should this candidate move to the next round? What should I ask in the interview?"></textarea>
+					<button class="primary-btn" type="submit"><i data-lucide="send"></i>Ask</button>
 				</form>
 		</aside>
 	</main>
@@ -726,12 +726,12 @@
 		};
 
 		const fallbackResults = [
-			{ id: "problemFraming", label: "Problem Framing", short: "Ambiguity Handling", score: 7.6, reviewerScore: 7.6, confidence: "High", evidence: ["Scoped the MVP from an ambiguous request to improve knowledge search."], rationale: "모호한 문제를 MVP로 좁힌 근거가 있습니다.", concern: "가정 설정 방식은 인터뷰 확인이 필요합니다.", followUp: "처음 문제가 모호했을 때 어떤 가정을 세웠나요?", reviewerNote: "" },
-			{ id: "practicalBuilding", label: "Practical Building", short: "Execution", score: 8.8, reviewerScore: 8.8, confidence: "High", evidence: ["Built a working LLM document review workflow."], rationale: "실제 workflow build와 pilot impact가 있습니다.", concern: "production handoff 수준은 추가 확인이 필요합니다.", followUp: "직접 만든 artifact의 핵심 기능은 무엇인가요?", reviewerNote: "" },
-			{ id: "aiLeverage", label: "AI Leverage", short: "Technical Fluency", score: 7.1, reviewerScore: 7.1, confidence: "High", evidence: ["Implemented a lightweight RAG prototype using OpenAI APIs."], rationale: "RAG, prompt, evaluation 관련 근거가 있습니다.", concern: "agentic autonomy 경험은 제한적으로 보입니다.", followUp: "AI 출력 품질을 어떻게 평가했나요?", reviewerNote: "" },
-			{ id: "enterpriseJudgment", label: "Enterprise Judgment", short: "Governance", score: 9.2, reviewerScore: 9.2, confidence: "High", evidence: ["Partnered with security and data governance teams."], rationale: "보안, governance, human approval 근거가 강합니다.", concern: "공식 control design 경험은 확인이 필요합니다.", followUp: "보안 제약을 설계에 어떻게 반영했나요?", reviewerNote: "" },
-			{ id: "stakeholderThinking", label: "Stakeholder Thinking", short: "User-centered", score: 8.1, reviewerScore: 8.1, confidence: "High", evidence: ["Ran discovery sessions with managers, analysts, legal, and IT."], rationale: "다양한 stakeholder와 협업한 근거가 있습니다.", concern: "갈등 상황의 tradeoff는 인터뷰에서 확인해야 합니다.", followUp: "stakeholder 요구가 충돌했을 때 어떤 선택을 했나요?", reviewerNote: "" },
-			{ id: "communicationGrowth", label: "Communication & Growth", short: "Learning Agility", score: 7.3, reviewerScore: 7.3, confidence: "Medium", evidence: ["Presented demo outcomes and wrote onboarding notes."], rationale: "설명력과 학습 민첩성 근거가 있습니다.", concern: "발표 품질과 학습 깊이는 추가 확인이 필요합니다.", followUp: "새 기술을 빠르게 배워 적용한 사례는 무엇인가요?", reviewerNote: "" }
+			{ id: "problemFraming", label: "Problem Framing", short: "Ambiguity Handling", score: 7.6, reviewerScore: 7.6, confidence: "High", evidence: ["Scoped the MVP from an ambiguous request to improve knowledge search."], rationale: "The resume shows evidence of narrowing an ambiguous problem into an MVP.", concern: "The interview should confirm how the candidate set assumptions.", followUp: "When the problem was ambiguous, what assumptions did you make?", reviewerNote: "" },
+			{ id: "practicalBuilding", label: "Practical Building", short: "Execution", score: 8.8, reviewerScore: 8.8, confidence: "High", evidence: ["Built a working LLM document review workflow."], rationale: "The resume shows evidence of building a working workflow with pilot impact.", concern: "The production handoff depth should be confirmed.", followUp: "What were the core features of the artifact you built?", reviewerNote: "" },
+			{ id: "aiLeverage", label: "AI Leverage", short: "Technical Fluency", score: 7.1, reviewerScore: 7.1, confidence: "High", evidence: ["Implemented a lightweight RAG prototype using OpenAI APIs."], rationale: "The resume shows evidence related to RAG, prompts, and evaluation.", concern: "Agentic autonomy experience appears limited.", followUp: "How did you evaluate AI output quality?", reviewerNote: "" },
+			{ id: "enterpriseJudgment", label: "Enterprise Judgment", short: "Governance", score: 9.2, reviewerScore: 9.2, confidence: "High", evidence: ["Partnered with security and data governance teams."], rationale: "The resume shows strong evidence of security, governance, and human approval awareness.", concern: "Formal control design experience should be confirmed.", followUp: "How did you reflect security constraints in the design?", reviewerNote: "" },
+			{ id: "stakeholderThinking", label: "Stakeholder Thinking", short: "User-centered", score: 8.1, reviewerScore: 8.1, confidence: "High", evidence: ["Ran discovery sessions with managers, analysts, legal, and IT."], rationale: "The resume shows evidence of working with multiple stakeholders.", concern: "The interview should confirm how the candidate handled stakeholder trade-offs.", followUp: "What did you choose when stakeholder needs conflicted?", reviewerNote: "" },
+			{ id: "communicationGrowth", label: "Communication & Growth", short: "Learning Agility", score: 7.3, reviewerScore: 7.3, confidence: "Medium", evidence: ["Presented demo outcomes and wrote onboarding notes."], rationale: "The resume shows evidence of communication and learning agility.", concern: "Presentation quality and depth of learning should be confirmed.", followUp: "What is an example of quickly learning and applying a new technology?", reviewerNote: "" }
 		];
 
 		const stored = readStoredResult();
@@ -781,10 +781,10 @@
 					score,
 					reviewerScore: score,
 					confidence: found.confidence || "Medium",
-					evidence: Array.isArray(found.evidence) && found.evidence.length ? found.evidence : ["Resume에서 직접적인 근거가 부족합니다."],
-					rationale: found.rationale || "해당 축의 근거를 검토해야 합니다.",
-					concern: found.concern || "정보가 제한적이므로 인터뷰 확인이 필요합니다.",
-					followUp: found.followUp || "이 역량을 보여주는 가장 구체적인 사례를 설명해 주세요.",
+					evidence: Array.isArray(found.evidence) && found.evidence.length ? found.evidence : ["The resume does not provide direct evidence for this axis."],
+					rationale: found.rationale || "Evidence for this axis should be reviewed.",
+					concern: found.concern || "Information is limited, so interview confirmation is needed.",
+					followUp: found.followUp || "Please describe the most specific example that demonstrates this capability.",
 					reviewerNote: found.reviewerNote || ""
 				};
 			});
@@ -850,7 +850,7 @@
 					</div>
 
 					<div class="cohort-panel">
-						<div class="cohort-head"><span>같은 axis의 다른 지원자 평가 사례</span><span>comparison set</span></div>
+						<div class="cohort-head"><span>Other candidate examples on the same axis</span><span>comparison set</span></div>
 						<div class="cohort-grid">
 							${cohort.map((example) => `
 								<div class="cohort-card">
@@ -862,7 +862,7 @@
 					</div>
 
 					<div class="calibration-note">
-						<textarea data-note="${result.id}" placeholder="평균/다른 지원자 사례를 보고 조정한 이유를 기록하세요.">${escapeHtml(result.reviewerNote)}</textarea>
+						<textarea data-note="${result.id}" placeholder="Record why the score was adjusted after reviewing the comparison examples.">${escapeHtml(result.reviewerNote)}</textarea>
 						<select aria-label="${result.label} calibration decision">
 							<option>Keep calibrated score</option>
 							<option>Raise after comparison review</option>
@@ -941,18 +941,18 @@
 			const candidateAverage = average(state.results.map((item) => item.reviewerScore));
 			const cohortAverage = average(state.results.map((item) => average((cohortExamples[item.id] || []).map((example) => example.score))));
 
-			if (lower.includes("calibration") || lower.includes("다른 지원자") || lower.includes("비교군")) {
-				return `Calibration 관점에서는 ${sortedLow.slice(0, 2).map((item) => item.label).join(", ")}를 먼저 봐야 합니다. 이 축들은 후보자 점수와 같은 axis의 다른 지원자 사례를 함께 확인해 인터뷰 질문으로 검증하는 것이 좋습니다.\n\n특히 ${sortedLow[0].label}의 follow-up은 "${sortedLow[0].followUp}" 입니다.`;
+			if (lower.includes("calibration") || lower.includes("other candidate") || lower.includes("comparison")) {
+				return `From a calibration perspective, review ${sortedLow.slice(0, 2).map((item) => item.label).join(", ")} first. These axes should be checked against other candidate examples on the same axis and verified through interview questions.\n\nA useful follow-up for ${sortedLow[0].label} is: "${sortedLow[0].followUp}"`;
 			}
 
-			if (lower.includes("평균") || lower.includes("비교군") || lower.includes("비교")) {
+			if (lower.includes("average") || lower.includes("comparison") || lower.includes("compare")) {
 				const cohortAverageFor = (item) => average((cohortExamples[item.id] || []).map((example) => example.score));
 				const biggestDelta = [...state.results].sort((a, b) => (b.reviewerScore - cohortAverageFor(b)) - (a.reviewerScore - cohortAverageFor(a)))[0];
 				const smallestDelta = [...state.results].sort((a, b) => (a.reviewerScore - cohortAverageFor(a)) - (b.reviewerScore - cohortAverageFor(b)))[0];
-				return `후보자 평균은 ${candidateAverage.toFixed(1)}이고 다른 지원자 비교군 평균은 ${cohortAverage.toFixed(1)}입니다. 가장 강한 상대 우위는 ${biggestDelta.label}(+${(biggestDelta.reviewerScore - cohortAverageFor(biggestDelta)).toFixed(1)})입니다. 가장 확인이 필요한 축은 ${smallestDelta.label}(${(smallestDelta.reviewerScore - cohortAverageFor(smallestDelta)).toFixed(1)} vs cohort)입니다.`;
+				return `The candidate average is ${candidateAverage.toFixed(1)}, and the other-candidate comparison average is ${cohortAverage.toFixed(1)}. The strongest relative advantage is ${biggestDelta.label} (+${(biggestDelta.reviewerScore - cohortAverageFor(biggestDelta)).toFixed(1)}). The axis that needs the most follow-up is ${smallestDelta.label} (${(smallestDelta.reviewerScore - cohortAverageFor(smallestDelta)).toFixed(1)} vs cohort).`;
 			}
 
-			return `요약하면 이 후보자의 강점은 ${sortedHigh.slice(0, 2).map((item) => `${item.label} ${formatScore(item.reviewerScore)}`).join("와 ")}입니다. 주요 리스크 또는 확인 지점은 ${sortedLow.slice(0, 2).map((item) => item.label).join("와 ")}입니다.\n\n다음 인터뷰에서는 "${sortedLow[0].followUp}" 질문으로 점수 근거를 검증하는 것이 좋습니다. 이 답변은 분석 결과 기반 보조 의견이며 최종 판단은 human review로 남겨야 합니다.`;
+			return `In summary, this candidate's strongest areas are ${sortedHigh.slice(0, 2).map((item) => `${item.label} ${formatScore(item.reviewerScore)}`).join(" and ")}. The main risk or follow-up areas are ${sortedLow.slice(0, 2).map((item) => item.label).join(" and ")}.\n\nIn the interview, I would verify the score with this question: "${sortedLow[0].followUp}" This is a review-support answer based on the analysis results, and the final decision should remain human-owned.`;
 		}
 
 		function addChatMessage(role, text) {
@@ -970,13 +970,13 @@
 
 		async function handleChat(question) {
 			addChatMessage("user", question);
-			const pending = addChatMessage("assistant", "분석 결과를 확인하는 중입니다...");
+			const pending = addChatMessage("assistant", "Reviewing the analysis results...");
 			try {
 				const answer = await answerWithOpenAI(question);
 				setChatMessageContent(pending, answer || answerLocally(question));
 			} catch (error) {
 				console.error(error);
-				setChatMessageContent(pending, `${answerLocally(question)}\n\n참고: gpt-5.4 호출에 실패해 로컬 분석 답변으로 전환했습니다.`);
+				setChatMessageContent(pending, `${answerLocally(question)}\n\nNote: The gpt-5.4 call failed, so the assistant switched to a local analysis response.`);
 			}
 		}
 
@@ -1107,7 +1107,7 @@
 
 		lucide.createIcons();
 		render();
-		addChatMessage("assistant", "후보자 평가 결과를 함께 검토할 수 있습니다. 강점, 리스크, 인터뷰 질문, 점수 보정이 필요한 축을 물어보세요.");
+		addChatMessage("assistant", "I can help review the candidate evaluation results. Ask about strengths, risks, interview questions, or axes that may need score calibration.");
 	</script>
 </body>
 </html>
